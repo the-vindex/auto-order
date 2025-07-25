@@ -3,7 +3,7 @@ import { useState } from 'react'
 import './App.css'
 import Home from './Home.jsx'
 import { Routes, Route } from 'react-router-dom'
-import RequireAuth from './RequireAuth.jsx'
+import RequireAuth from './auth/RequireAuth.jsx'
 
 function App() {
 	const [count, setCount] = useState(0)
