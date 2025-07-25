@@ -4,8 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node --esm --transpile-only ./src/index.ts",
-    "start": "node --loader ts-node/esm ./src/index.ts"
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
