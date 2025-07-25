@@ -1,3 +1,11 @@
+# SQL Schema Draft, version at scope of Scenario 1
+
+This is a draft of the SQL schema for the project, based on the database diagram:
+
+![DB Diagram v1](/docs/DB%20diagram%20v1.png)
+
+PostgreSQL dialect is used, with some assumptions about the data types and constraints.
+```sql
 /* ---------- ENUM TYPES ---------- */
 CREATE TYPE purchase_reminder_rule_type AS ENUM (
 'on_specific_datetime',
@@ -85,3 +93,4 @@ INCLUDE (rule_type, notification_channel, target_price, target_date);
 -- Fast lookup of URL during add flow
 CREATE INDEX idx_product_url_link
 ON product_url (url_link);
+```
