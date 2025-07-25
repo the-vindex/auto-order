@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { isLoggedIn } from "./auth/jwt.js"
+import { isLoggedIn } from "./jwt.js"
 
 const RequireAuth = ({ children }) => {
 	console.log("Authenticating user")
