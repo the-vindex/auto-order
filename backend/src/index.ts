@@ -15,7 +15,7 @@ app.use(express.json());
 
 app.get('/', ping);
 
-app.post('/user', createUserApi);
+app.post('/users', createUserApi);
 
 app.get('/users', getAllUsersApi);
 
