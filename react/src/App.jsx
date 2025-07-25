@@ -1,13 +1,10 @@
-import { useState } from 'react'
-
 import Home from './Home.jsx'
 import { Routes, Route } from 'react-router-dom'
 import RequireAuth from './auth/RequireAuth.jsx'
 import './index.css'
 
+import Login from './Login.jsx'
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <Routes>
       <Route
@@ -18,6 +15,7 @@ function App() {
           </RequireAuth>
         }
       />
+      <Route path="/login" element={<Login />} />
     </Routes>
   )
 }
