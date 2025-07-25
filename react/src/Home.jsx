@@ -1,4 +1,9 @@
 import React, { useState } from 'react'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 
 const Home = () => {
   // Dummy data for items (to be replaced by backend data)
@@ -30,8 +35,12 @@ const Home = () => {
     setItems([...items, newItem])
   }
 
+  const handleDeleteItem = name => {
+    setItems(items.filter(i => i.name !== name))
+  }
+
   return (
-    <div className="min-h-screen min-w-screen bg-gray-100 flex flex-col items-center">
+    <div className="min-h-screen min-w-screen flex flex-col items-center">
       <h1 className="text-4xl font-bold text-center text-blue-600 mt-8 mb-6">
         Home Page
       </h1>
@@ -69,11 +78,30 @@ const Home = () => {
                     Reminder: {new Date(item.reminderDate).toLocaleDateString()}
                   </p>
                 </div>
-                <button
-                  className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                  onClick={() => alert(`Edit ${item.name}`)}>
-                  Edit
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    onClick={() => handleDeleteItem(item.name)}>
+                    Delete
+                  </button>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                        Edit
+                      </button>
+                    </PopoverTrigger>
+
+                    <PopoverContent className="max-w-50">
+                      <label className="mr-2 text-sm" htmlFor="name">
+                        Name
+                      </label>
+                      <input
+                        className="border-1  border-black max-w-30"
+                        id="name"></input>
+                    </PopoverContent>
+                  </Popover>
+                </div>
               </li>
             ))}
           </ul>
