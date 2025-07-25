@@ -4,7 +4,7 @@ This is a draft of the SQL schema for the project, based on the database diagram
 
 ![DB Diagram v1](/docs/DB%20diagram%20v1.png)
 
-PostgreSQL dialect is used, with some assumptions about the data types and constraints.
+PostgresSQL dialect is used, with some assumptions about the data types and constraints.
 ```sql
 /* ---------- ENUM TYPES ---------- */
 CREATE TYPE purchase_reminder_rule_type AS ENUM (
