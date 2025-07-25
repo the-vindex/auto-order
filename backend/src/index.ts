@@ -1,8 +1,5 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import {db} from './db';
-import {users} from './db/schema';
-import {getAllUsers} from "./db/queries/user_queries";
 import {ping} from './api/ping';
 import {createUserApi, getAllUsersApi} from "./api/users";
 
@@ -15,9 +12,13 @@ app.use(express.json());
 
 app.get('/', ping);
 
-app.post('/user', createUserApi);
+const userRouter = express.Router();
 
-app.get('/users', getAllUsersApi);
+userRouter.post('/users', createUserApi);
+
+userRouter.get('/users', getAllUsersApi);
+
+app.use('/api/v1', userRouter);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
