@@ -3,6 +3,8 @@ import { useState } from 'react'
 import Home from './Home.jsx'
 import { Routes, Route } from 'react-router-dom'
 import RequireAuth from './auth/RequireAuth.jsx'
+import './index.css'
+import AddItem from './items/AddItem.jsx'
 
 function App() {
 	const [count, setCount] = useState(0)
@@ -12,9 +14,13 @@ function App() {
 			<Route
 				path="/"
 				element={
-					<RequireAuth>
-						<Home />
-					</RequireAuth>
+					<Home />
+				}
+			/>
+			<Route
+				path="/additem"
+				element={
+					<AddItem />
 				}
 			/>
 		</Routes>
