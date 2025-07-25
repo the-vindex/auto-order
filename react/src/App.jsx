@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-import './App.css'
 import Home from './Home.jsx'
 import { Routes, Route } from 'react-router-dom'
 import RequireAuth from './auth/RequireAuth.jsx'
@@ -20,6 +19,7 @@ function App() {
 			/>
 		</Routes>
 	)
+}
 
 
 export default App;
