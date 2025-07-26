@@ -1,3 +1,4 @@
+import { hashPassword } from "../../auth/auth";
 import { db } from "../index";
 import { users } from "../schema";
 import { eq, lt, gte, ne } from 'drizzle-orm';
@@ -15,8 +16,17 @@ export async function getUserById(id: string) {
 	return user[0];
 }
 
+export async function getUserByEmail(email: string) {
+	const user = await db.select().from(users).where(eq(users.email, email));
+	if (!user || user.length === 0) {
+		throw new Error(`User with ID ${email} not found`);
+	}
+	return user[0];
+}
+
 export async function createUser(name: string, email: string, password: string) {
-	const [newUser] = await db.insert(users).values({ name, email, password }).returning();
+	const hashedPassword = await hashPassword(password)
+	const [newUser] = await db.insert(users).values({ name, email, password: hashedPassword }).returning();
 	return newUser;
 }
 
