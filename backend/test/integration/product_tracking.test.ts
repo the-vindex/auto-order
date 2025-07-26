@@ -1,14 +1,8 @@
 import request from 'supertest';
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import {configureApp} from '../../src/server';
-import {createUser} from "../../src/db/queries/user_queries";
-import {generateTestUserObject} from "../utils/test_data_factories";
+import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {ProductReminderDto} from "../../src/api/dto/product_reminder.dto";
-import {fakeAuth} from "../../src/auth/fakeAuth";
 import express from 'express';
-import {createAndLoginUser, createExpressAppWithFakeAuth} from '../utils/fakeAuthExpress';
-import {Products} from "../../src/db/queries/product_reminders";
-
+import {createAndLoginUser, createTestExpressInstance} from '../utils/auth_tools';
 
 
 describe('Product tracking API Integration Tests', () => {
@@ -16,7 +10,7 @@ describe('Product tracking API Integration Tests', () => {
     beforeAll(async () => {
         // You might want to clear the database or seed it before running tests
         // For now, we'll just ensure the app is ready.
-        app = createExpressAppWithFakeAuth();
+        app = createTestExpressInstance();
     });
 
     afterAll(async () => {
@@ -40,7 +34,7 @@ describe('Product tracking API Integration Tests', () => {
             .send(productReminderData)
             .set('Cookie', authCookie) // Use the auth cookie to authenticate the request
             .set('Accept', 'application/json')
-//            .expect('Content-Type', /json/)
+            //            .expect('Content-Type', /json/)
             .expect(201)
 
         expect(result).toBeDefined();

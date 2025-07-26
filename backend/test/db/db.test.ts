@@ -1,10 +1,9 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { Pool } from 'pg';
-import { users } from '../../src/db/schema';
-import { eq } from 'drizzle-orm';
-import { createUser, deleteUserById, getAllUsers, getUserById } from "../../src/db/queries/user_queries";
+import {afterAll, beforeAll, describe, expect, it} from 'vitest';
+import {drizzle} from 'drizzle-orm/node-postgres';
+import {migrate} from 'drizzle-orm/node-postgres/migrator';
+import {Pool} from 'pg';
+import {users} from '../../src/db/schema';
+import {createUser, deleteUserById, getUserById} from "../../src/db/queries/user_queries";
 import {generateTestUserObject} from "../utils/test_data_factories";
 
 describe('Users Database Tests', () => {
