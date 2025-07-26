@@ -1,34 +1,21 @@
-import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { validateCookie } from '../api/user';
+import { Navigate } from 'react-router-dom'
+import { validateCookie } from '../api/user'
+import { useQuery } from '@tanstack/react-query'
 
 const RequireAuth = ({ children }) => {
-	const [isLoading, setIsLoading] = useState(true);
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isPending, isError, error, data } = useQuery({
+    queryKey: ['validate'],
+    queryFn: () => validateCookie(),
+    staleTime: 30000,
+  })
 
-	useEffect(() => {
-		const checkAuth = async () => {
-			try {
-				const result = await validateCookie();
-				setIsLoggedIn(result);
-			} catch (err) {
-				setIsLoggedIn(false);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-		checkAuth();
-	}, []);
+  if (isPending) return 'Loading...'
+  if (isError) {
+    return `Error: ${error.message}`
+  }
+  if (!data) return <Navigate to="/login" replace />
 
-	if (isLoading) {
-		return <div>Loading...</div>;
-	}
+  return children
+}
 
-	if (!isLoggedIn) {
-		return <Navigate to="/login" replace />;
-	}
-
-	return children;
-};
-
-export default RequireAuth;
+export default RequireAuth
