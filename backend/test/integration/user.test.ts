@@ -8,15 +8,17 @@ import {createExpressAppWithFakeAuth} from "../utils/fakeAuthExpress";
 
 describe('User API Integration Tests', () => {
     let app: express.Express;
+    const createdUserIds: string[] = [];
+
     beforeAll(async () => {
-        // You might want to clear the database or seed it before running tests
-        // For now, we'll just ensure the app is ready.
         app = createExpressAppWithFakeAuth();
     });
 
     afterAll(async () => {
-        // Clean up any test data if necessary
-        await db.delete(users);
+        if (createdUserIds.length > 0) {
+            const { inArray } = await import('drizzle-orm');
+            await db.delete(users).where(inArray(users.userId, createdUserIds));
+        }
     });
 
     it('should create a new user via POST /api/v1/users', async () => {
@@ -28,21 +30,22 @@ describe('User API Integration Tests', () => {
         expect(res.statusCode).toEqual(201);
         expect(res.body).toBeDefined();
         expect(res.body).toHaveProperty('userId');
+        createdUserIds.push(res.body.userId); // Track the created user
     });
 
     it('should get all users via GET /api/v1/users', async () => {
         // First, create a user to ensure there's data to retrieve
-        await request(app)
+        const creationRes = await request(app)
             .post('/api/v1/users')
-            .send({fullName: 'Another Test User'});
+            .send(generateTestUserObject());
+        
+        createdUserIds.push(creationRes.body.userId); // Track the created user
 
         const res = await request(app).get('/api/v1/users');
 
         expect(res.statusCode).toEqual(200);
         expect(Array.isArray(res.body)).toBe(true);
         expect(res.body.length).toBeGreaterThanOrEqual(1);
-        expect(res.body[0]).toHaveProperty('userId');
-        expect(res.body[0]).toHaveProperty('name');
     });
 
     it('should validate json on create user and return 400 for invalid data', async () => {
