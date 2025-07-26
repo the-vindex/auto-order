@@ -4,22 +4,37 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { Plus, Search } from 'lucide-react'
+import { AppSidebar } from '@/components/app-sidebar'
+import { ReminderCard } from '@/components/reminder-card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar'
 
 const Home = () => {
   // Dummy data for items (to be replaced by backend data)
-  const [items, setItems] = useState([
+  const [remindersData, setItems] = useState([
     {
       name: 'Soda',
       site: 'https://www.amazon.com',
+      currentPrice: '279.99 €',
+      discount: '-20.00 €',
+      status: 'active',
       reminderDate: '2025-09-01',
     },
     {
       name: 'T-Shirt',
       site: 'https://www.amazon.com',
+      currentPrice: '279.99 €',
+      discount: '-20.00 €',
+      status: 'active',
       reminderDate: '2025-09-01',
     },
     {
       name: 'Shoes',
+      currentPrice: '279.99 €',
+      discount: '-20.00 €',
+      status: 'active',
       site: 'https://www.amazon.com',
       reminderDate: '2025-09-01',
     },
@@ -29,85 +44,69 @@ const Home = () => {
   const handleAddItem = () => {
     const newItem = {
       name: 'New Item',
+      currentPrice: '279.99 €',
+      discount: '-20.00 €',
+      status: 'active',
       site: 'https://example.com',
       reminderDate: new Date().toISOString().split('T')[0], // Current date in YYYY-MM-DD
     }
-    setItems([...items, newItem])
+    setItems([...remindersData, newItem])
   }
 
-  const handleDeleteItem = name => {
-    setItems(items.filter(i => i.name !== name))
-  }
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const filteredReminders = remindersData.filter(reminder =>
+    reminder.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
 
   return (
-    <div className="min-h-screen min-w-screen flex flex-col items-center">
-      <h1 className="text-4xl font-bold text-center text-blue-600 mt-8 mb-6">
-        Home Page
-      </h1>
-      <div className="w-full max-w-2xl">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold text-gray-800">
-            Subscriptions
-          </h2>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            onClick={handleAddItem}>
-            Add
-          </button>
-        </div>
-        {items.length === 0 ? (
-          <p className="text-gray-500 text-center">No subscriptions found.</p>
-        ) : (
-          <ul className="space-y-4">
-            {items.map((item, index) => (
-              <li
-                key={index}
-                className="bg-white p-4 rounded-lg shadow-md flex justify-between items-center">
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900">
-                    {item.name}
-                  </h3>
-                  <a
-                    href={item.site}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline">
-                    {item.site}
-                  </a>
-                  <p className="text-gray-600">
-                    Reminder: {new Date(item.reminderDate).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                    onClick={() => handleDeleteItem(item.name)}>
-                    Delete
-                  </button>
+    <SidebarProvider>
+      <div className="flex h-screen w-full">
+        <AppSidebar />
+        <SidebarInset className="flex-1">
+          <div className="flex flex-col h-full">
+            {/* Header */}
+            <div className="border-b bg-white px-6 py-4">
+              <div>
+                <h1 className="text-2xl font-semibold text-gray-900">
+                  My Reminders
+                  <Button className="justify-content bg-blue-600 hover:bg-blue-700 ml-5">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add
+                  </Button>
+                </h1>
 
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                        Edit
-                      </button>
-                    </PopoverTrigger>
+                <p className="text-sm text-gray-500">
+                  {remindersData.length} reminders tracking
+                </p>
+              </div>
+            </div>
 
-                    <PopoverContent className="max-w-50">
-                      <label className="mr-2 text-sm" htmlFor="name">
-                        Name
-                      </label>
-                      <input
-                        className="border-1  border-black max-w-30"
-                        id="name"></input>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+            {/* Content */}
+            <div className="flex-1 p-6">
+              {/* Search bar */}
+              <div className="relative mb-6 flex ">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search reminders..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              {/* Add button above search */}
+
+              {/* Reminders list */}
+              <div className="space-y-4">
+                {filteredReminders.map(reminder => (
+                  <ReminderCard key={reminder.id} item={reminder} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   )
 }
 
