@@ -19,7 +19,7 @@ export async function getUserById(id: string) {
 export async function getUserByEmail(email: string) {
 	const user = await db.select().from(users).where(eq(users.email, email));
 	if (!user || user.length === 0) {
-		throw new Error(`User with ID ${email} not found`);
+		return null;
 	}
 	return user[0];
 }
