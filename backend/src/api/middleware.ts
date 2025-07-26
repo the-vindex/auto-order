@@ -5,9 +5,9 @@ import {
 	UserAlreadyExistsError,
 	UserForbiddenError,
 	UserNotAuthenticatedError,
-} from "./errors.js";
-import { respondWithError } from "./json.js";
-import { validateJWT } from "../auth/auth.js";
+} from "./errors";
+import { respondWithError } from "./json";
+import { validateJWT } from "../auth/auth";
 
 export function errorMiddleWare(
 	err: Error,
