@@ -66,6 +66,7 @@ export function setAuthCookie(res: express.Response, userId: string) {
 		secure: false,
 		sameSite: "strict",
 		maxAge: 1000 * 60 * 60 * 24,
+		path: '/',
 	});
 }
 

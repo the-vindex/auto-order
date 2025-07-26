@@ -10,10 +10,14 @@ import {
 	SidebarMenuItem,
 	SidebarHeader,
 } from '@/components/ui/sidebar'
+import { logoutUser } from '../api/user'
 
-const logoutUser = () => {
-	alert('logging out user')
+async function handleLogoutClick(e) {
+	e.preventDefault();
+	await logoutUser();
+	window.location.href = '/login';
 }
+
 const navigationItems = [
 	{
 		title: 'Reminders',
@@ -30,9 +34,8 @@ const navigationItems = [
 	{
 		title: 'Logout',
 		icon: LogOut,
-		url: 'login',
 		isActive: false,
-		onClick: logoutUser,
+		onClick: handleLogoutClick,
 	}
 ]
 

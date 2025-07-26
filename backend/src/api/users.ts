@@ -67,10 +67,12 @@ export async function loginUserApi(req: express.Request, res: express.Response) 
 
 export async function logoutUserApi(req: express.Request, res: express.Response) {
 	console.log('logging out user.')
-	res.clearCookie('token', {
+	res.cookie('token', '', {
 		httpOnly: true,
 		secure: false,
 		sameSite: 'strict',
+		expires: new Date(0),
+		path: '/',
 	});
 	respondWithJSON(res, 200, {});
 }
