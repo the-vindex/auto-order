@@ -203,7 +203,7 @@ const Home = () => {
                       onOpenChange={setIsPopoverOpen}>
                       <PopoverTrigger asChild>
                         <Button className="bg-blue-600 hover:bg-blue-700">
-                          <Plus className="h-4 w-4 mr-2" />
+                          <Plus className="h-4 w-4" />
                           Add
                         </Button>
                       </PopoverTrigger>
@@ -424,7 +424,7 @@ const Home = () => {
 
                             {/* Error Message */}
                             {createReminderMutation.isError && (
-                              <div className="text-red-500 text-sm text-center">
+                              <div className="text-red-500 text-xs text-center">
                                 {createReminderMutation.error?.message ||
                                   'Failed to create reminder'}
                               </div>
