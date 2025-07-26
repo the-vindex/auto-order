@@ -79,6 +79,24 @@ if [ -z "$PRODUCT_ID" ] || [ "$PRODUCT_ID" == "null" ]; then
 fi
 
 log "Product reminder created successfully. Product ID: $PRODUCT_ID"
+
+# 5. Read all product reminders for the user
+log "Reading all product reminders..."
+READ_REMINDERS_RESPONSE=$(curl -s -X GET "${BASE_URL}/product-reminders" \
+  -b "$COOKIE_JAR" \
+  -H "Accept: application/json"
+)
+
+log "All product reminders for user:\n$READ_REMINDERS_RESPONSE"
+
+# Optional: Add a basic check to ensure the created reminder is in the list
+if echo "$READ_REMINDERS_RESPONSE" | jq -e '.[] | select(.productId == "'"$PRODUCT_ID"'")' > /dev/null; then
+  log "Successfully found the created product reminder in the list."
+else
+  echo "[ERROR] Created product reminder not found in the list of all reminders."
+  exit 1
+fi
+
 log "E2E test completed successfully!"
 
 exit 0

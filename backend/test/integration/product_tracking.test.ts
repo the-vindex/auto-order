@@ -5,6 +5,27 @@ import express from 'express';
 import {createAndLoginUser, createTestExpressInstance} from '../utils/auth_tools';
 
 
+function generateProductReminderData() {
+    const productReminderData = {
+        name: "Test Product",
+        urls: ["https://example.com/product1"],
+        reminderDetails: {
+            type: "targetDate",
+            targetDate: "2023-01-01",
+        }
+    } as ProductReminderDto.ProductReminder;
+    return productReminderData;
+}
+
+async function callApi_createProductReminder(app: express.Express, productReminderData: ProductReminderDto.ProductReminder, authCookie: string) {
+    return await request(app)
+        .post('/api/v1/product-reminders')
+        .send(productReminderData)
+        .set('Cookie', authCookie) // Use the auth cookie to authenticate the request
+        .set('Accept', 'application/json')
+        .expect(201);
+}
+
 describe('Product tracking API Integration Tests', () => {
     let app: express.Express;
     beforeAll(async () => {
@@ -19,23 +40,9 @@ describe('Product tracking API Integration Tests', () => {
 
     it('should create a new product tracking record via POST /api/v1/product-tracking', async () => {
         const {newUser, authCookie} = await createAndLoginUser(app);
+        const productReminderData = generateProductReminderData();
 
-        const productReminderData = {
-            name: "Test Product",
-            urls: ["https://example.com/product1"],
-            reminderDetails: {
-                type: "targetDate",
-                targetDate: "2023-01-01",
-            }
-        } as ProductReminderDto.ProductReminder;
-
-        let result = await request(app)
-            .post('/api/v1/product-reminders')
-            .send(productReminderData)
-            .set('Cookie', authCookie) // Use the auth cookie to authenticate the request
-            .set('Accept', 'application/json')
-            //            .expect('Content-Type', /json/)
-            .expect(201)
+        let result = await callApi_createProductReminder(app, productReminderData, authCookie);
 
         expect(result).toBeDefined();
         let resultBody = result.body;
@@ -55,6 +62,29 @@ describe('Product tracking API Integration Tests', () => {
         } else {
             throw new Error(`This shouldn't happen, Unsupported reminder type: ${reminderDetails.type}`);
         }
+    });
+
+
+    it('Should read all product reminders for a user', async () => {
+        const {newUser, authCookie} = await createAndLoginUser(app);
+        const productReminder = generateProductReminderData();
+        const result = await callApi_createProductReminder(app, productReminder, authCookie);
+        const newProductReminder = result.body;
+
+        const getResult = await request(app)
+            .get('/api/v1/product-reminders')
+            .set('Cookie', authCookie) // Use the auth cookie to authenticate the request
+            .set('Accept', 'application/json')
+            .expect(200)
+
+        expect(getResult).toBeDefined();
+        expect(getResult.body).toBeDefined();
+        expect(getResult.body).toBeInstanceOf(Array);
+        expect(getResult.body.length).toBeGreaterThan(0);
+        const foundProductReminder = getResult.body.find((reminder: any) => reminder.productId === newProductReminder.productId);
+        expect(foundProductReminder).toBeDefined();
+        expect(foundProductReminder.name).toBe(newProductReminder.name);
+        expect(foundProductReminder.urls).toEqual(newProductReminder.urls);
 
     });
 });
