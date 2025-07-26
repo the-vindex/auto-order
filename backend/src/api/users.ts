@@ -1,5 +1,8 @@
 import express from "express";
-import { createUser, getAllUsers } from "../db/queries/user_queries";
+import { createUser, getAllUsers, getUserByEmail } from "../db/queries/user_queries";
+import { makeJWT, setAuthCookie, validateJWT, verifyPassword } from "../auth/auth";
+import { respondWithError, respondWithJSON } from "./json";
+import { NotFoundError, UserAlreadyExistsError, UserNotAuthenticatedError } from "./errors";
 
 export async function createUserApi(req: express.Request, res: express.Response) {
 	try {
@@ -7,26 +10,71 @@ export async function createUserApi(req: express.Request, res: express.Response)
 			return res.status(400).send('Bad Request: Missing request body');
 		}
 
-		if (!req.body.name) {
-			return res.status(400).send('Bad Request: Missing name');
-		}
-
 		const { name, email, password } = req.body;
 
-		const newUser = await createUser(name);
-		res.status(201).json(newUser);
-	} catch (error) {
+		//prob shouldnt be logging emails/passwords
+		const newUser = await createUser(name, email, password);
+
+		setAuthCookie(res, newUser.userId);
+		respondWithJSON(res, 201, {});
+	} catch (error: any) {
+		if (error?.cause?.code === '23505') {
+			throw new UserAlreadyExistsError('Email is already in use.');
+		}
 		console.error('Error creating user:', error);
-		res.status(500).send('Internal Server Error');
+		throw error;
 	}
 }
 
 export async function getAllUsersApi(req: express.Request, res: express.Response) {
 	try {
 		const allUsers = await getAllUsers();
-		res.status(200).json(allUsers);
+		respondWithJSON(res, 200, allUsers);
 	} catch (error) {
 		console.error('Error fetching users:', error);
-		res.status(500).send('Internal Server Error');
+		throw error;
 	}
+}
+
+export async function loginUserApi(req: express.Request, res: express.Response) {
+	try {
+		const { email, password } = req.body;
+
+
+		const user = await getUserByEmail(email);
+		if (!user) {
+			console.log(`User with email ${email} not found.`)
+			throw new NotFoundError('User not found with given email.')
+		}
+
+		const doPasswordsMatch = await verifyPassword(password, user.password);
+
+		if (!doPasswordsMatch) {
+			throw new UserNotAuthenticatedError('Incorrect password.')
+		}
+
+		setAuthCookie(res, user.userId);
+		respondWithJSON(res, 200, {})
+
+	} catch (error) {
+		console.error('Error logging in user:', error);
+		throw error;
+	}
+
+
+}
+
+export async function validateLoginApi(req: express.Request, res: express.Response) {
+	const token = req.cookies?.token;
+	if (!token) {
+		throw new UserNotAuthenticatedError('Authentication token missing');
+	}
+
+	const jwtSecret = process.env.JWT_SECRET;
+	if (!jwtSecret) {
+		throw new Error('JWT_SECRET is not defined in environment variables.');
+	}
+
+	const userId = validateJWT(token, jwtSecret);
+	respondWithJSON(res, 200, {});
 }

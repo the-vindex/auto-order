@@ -1,0 +1,66 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test-backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: auto_order
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    - name: Wait for PostgreSQL to be ready
+      run: |
+        for i in $(seq 1 10); do
+          nc -z localhost 5432 && break
+          echo "Waiting for PostgreSQL..."
+          sleep 5
+        done
+    - name: Install backend dependencies
+      run: npm install
+      working-directory: ./backend
+    - name: Build backend
+      run: npm run build
+      working-directory: ./backend
+    - name: Run backend tests
+      run: npm test
+      working-directory: ./backend
+      env:
+        DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/auto_order?schema=public"
+
+  build-react:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    - name: Install React dependencies
+      run: npm install
+      working-directory: ./react
+    - name: Build React app
+      run: npm run build
+      working-directory: ./react

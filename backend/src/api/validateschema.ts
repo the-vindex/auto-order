@@ -6,7 +6,7 @@ import fs from 'fs';
 const v = new Validator();
 
 export function validateWithSchema(schemaName: string) {
-	const schemaPath = path.join(__dirname, '..', 'contracts', schemaName);
+	const schemaPath = path.join(__dirname, '..', 'api', 'contracts', schemaName);
 	const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
 
 	return (req: Request, res: Response, next: NextFunction) => {
