@@ -4,6 +4,7 @@ import { verifyPassword } from "../auth/auth";
 
 export async function createUserApi(req: express.Request, res: express.Response) {
 	try {
+		console.log(req.body)
 		if (!req.body) {
 			return res.status(400).send('Bad Request: Missing request body');
 		}
@@ -11,7 +12,7 @@ export async function createUserApi(req: express.Request, res: express.Response)
 		const { name, email, password } = req.body;
 
 		//prob shouldnt be logging emails/passwords
-		console.log(`reating user with name ${name} email ${email} password ${password}`)
+		console.log(`creating user with name ${name} email ${email} password ${password}`)
 		const newUser = await createUser(name, email, password);
 		res.status(201).json(newUser);
 	} catch (error) {
