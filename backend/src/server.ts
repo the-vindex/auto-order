@@ -5,7 +5,7 @@ import { ping } from './api/ping';
 import { createUserApi, getAllUsersApi, loginUserApi, validateLoginApi } from "./api/users";
 import { validateWithSchema } from "./api/validateschema"
 import { requestLogger } from './api/logger';
-import { errorMiddleWare } from './api/middleware';
+import { authMiddleWare, errorMiddleWare } from './api/middleware';
 import cookieParser from 'cookie-parser';
 
 
@@ -28,7 +28,7 @@ router.get('/users', getAllUsersApi);
 
 router.post('/login', loginUserApi)
 
-router.get('/me', validateLoginApi)
+router.get('/me', authMiddleWare, validateLoginApi)
 
 app.use('/api/v1', router);
 app.use(errorMiddleWare);

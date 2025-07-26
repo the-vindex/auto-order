@@ -65,16 +65,7 @@ export async function loginUserApi(req: express.Request, res: express.Response) 
 }
 
 export async function validateLoginApi(req: express.Request, res: express.Response) {
-	const token = req.cookies?.token;
-	if (!token) {
-		throw new UserNotAuthenticatedError('Authentication token missing');
-	}
-
-	const jwtSecret = process.env.JWT_SECRET;
-	if (!jwtSecret) {
-		throw new Error('JWT_SECRET is not defined in environment variables.');
-	}
-
-	const userId = validateJWT(token, jwtSecret);
+	const userId = req.headers['user-id'];
+	if (!userId) throw new UserNotAuthenticatedError('User is not logged in.');
 	respondWithJSON(res, 200, {});
 }

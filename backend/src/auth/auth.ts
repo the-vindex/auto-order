@@ -69,7 +69,11 @@ export function setAuthCookie(res: express.Response, userId: string) {
 	});
 }
 
-export function getAuthCookie(req: express.Request) {
-	const cookie = req.cookies.token;
-	//TODO
+export function getUserIdFrom(req: express.Request) {
+	const token = req.cookies.token;
+	const jwtSecret = process.env.JWT_SECRET;
+	if (!jwtSecret) {
+		throw new Error("JWT_SECRET is not defined in environment variables.");
+	}
+	const userId = validateJWT(token, jwtSecret)
 }
