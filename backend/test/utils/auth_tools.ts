@@ -2,13 +2,11 @@ import express from "express";
 import {fakeAuth} from "../../src/auth/fakeAuth";
 import {configureApp} from "../../src/server";
 import {generateTestUserObject} from "./test_data_factories";
-import {createUser} from "../../src/db/queries/user_queries";
 import request from "supertest";
 import {expect} from "vitest";
 
-export function createExpressAppWithFakeAuth() {
+export function createTestExpressInstance() {
     const app = express();
-    app.use("/api/v1", fakeAuth);
     configureApp(app);
     return app;
 }

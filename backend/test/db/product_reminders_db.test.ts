@@ -1,4 +1,4 @@
-import {describe, it, beforeAll, afterAll, expect} from 'vitest';
+import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {drizzle} from 'drizzle-orm/node-postgres';
 import {migrate} from 'drizzle-orm/node-postgres/migrator';
 import {Pool} from 'pg';
