@@ -1,13 +1,34 @@
-import { Navigate } from 'react-router-dom'
-import { isLoggedIn } from './jwt.js'
+import { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { validateCookie } from '../api/user';
 
 const RequireAuth = ({ children }) => {
-  console.log('Authenticating user')
-  if (!isLoggedIn()) {
-    console.log('User not logged in.')
-    return <Navigate to="/login" replace />
-  }
-  return children
-}
+	const [isLoading, setIsLoading] = useState(true);
+	const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-export default RequireAuth
+	useEffect(() => {
+		const checkAuth = async () => {
+			try {
+				const result = await validateCookie();
+				setIsLoggedIn(result);
+			} catch (err) {
+				setIsLoggedIn(false);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+		checkAuth();
+	}, []);
+
+	if (isLoading) {
+		return <div>Loading...</div>;
+	}
+
+	if (!isLoggedIn) {
+		return <Navigate to="/login" replace />;
+	}
+
+	return children;
+};
+
+export default RequireAuth;
