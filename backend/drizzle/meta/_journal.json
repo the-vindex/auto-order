@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1753465380201,
-      "tag": "0000_dizzy_hydra",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1753467590393,
-      "tag": "0001_massive_bastion",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1753486321782,
-      "tag": "0002_cooing_puff_adder",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1753534211662,
-      "tag": "0003_natural_the_professor",
+      "when": 1753557579134,
+      "tag": "0000_open_black_tom",
       "breakpoints": true
     }
   ]

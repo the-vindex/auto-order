@@ -1,7 +1,8 @@
+CREATE TYPE "public"."status" AS ENUM('active', 'invalidated', 'triggered');--> statement-breakpoint
 CREATE TABLE "product_reminders" (
 	"reminder_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"product_id" uuid NOT NULL,
-	"status" text DEFAULT 'active' NOT NULL,
+	"status" "status" DEFAULT 'active' NOT NULL,
 	"triggered_at" timestamp,
 	"reminder_type" text NOT NULL,
 	"reminder_details" json,
@@ -18,6 +19,16 @@ CREATE TABLE "products" (
 	"urls" text[],
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "users" (
+	"user_id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"full_name" text NOT NULL,
+	"email" text NOT NULL,
+	"password" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
 ALTER TABLE "product_reminders" ADD CONSTRAINT "product_reminders_product_id_products_product_id_fk" FOREIGN KEY ("product_id") REFERENCES "public"."products"("product_id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

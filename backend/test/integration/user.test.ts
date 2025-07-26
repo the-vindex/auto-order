@@ -16,7 +16,6 @@ describe('User API Integration Tests', () => {
 
     afterAll(async () => {
         // Clean up any test data if necessary
-        await db.delete(users);
     });
 
     it('should create a new user via POST /api/v1/users', async () => {
