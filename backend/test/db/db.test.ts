@@ -5,6 +5,7 @@ import { Pool } from 'pg';
 import { users } from '../../src/db/schema';
 import { eq } from 'drizzle-orm';
 import { createUser, deleteUserById, getAllUsers, getUserById } from "../../src/db/queries/user_queries";
+import {generateTestUserObject} from "../utils/test_data_factories";
 
 describe('Users Database Tests', () => {
 	const pool = new Pool({
@@ -27,11 +28,7 @@ describe('Users Database Tests', () => {
 	});
 
 	it('should create a new user', async () => {
-		const newUser = {
-			name: 'Test User',
-			email: 'test@jest.com',
-			password: 'password'
-		};
+		const newUser = generateTestUserObject();
 
 		const result = await createUser(newUser.name, newUser.email, newUser.password);
 		expect(result.name).toBe(newUser.name);
