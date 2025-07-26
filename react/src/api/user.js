@@ -9,18 +9,15 @@ export async function createUser(name, email, password) {
 	});
 
 	if (!res.ok) {
-		switch (res.status) {
-			//TODO maybe should throw these errors from the server side?
-			case 400:
-				return { 'error': 'Invalid data.' }
-			case 409:
-				return { 'error': 'User with given email already exists.' }
-			default:
-				return { 'error': 'Internal server error occurred.' }
+		const body = await res.json();
+		if ('error' in body) {
+			return body['error'];
+		} else {
+			return 'An internal server error has occured.'
 		}
 	}
 
-	return {};
+	return '';
 }
 
 export async function loginUser(email, password) {
@@ -34,19 +31,15 @@ export async function loginUser(email, password) {
 	});
 
 	if (!res.ok) {
-		switch (res.status) {
-			case 400:
-				return { 'error': 'Invalid data.' }
-			case 404:
-				return { 'error': 'No user found for given email.' }
-			case 401:
-				return { 'error': 'Password is incorrect.' }
-			default:
-				return { 'error': 'Internal server error occurred.' }
+		const body = await res.json();
+		if ('error' in body) {
+			return body['error'];
+		} else {
+			return 'An internal server error has occured.'
 		}
 	}
 
-	return {};
+	return '';
 }
 
 export async function validateCookie() {
