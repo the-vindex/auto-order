@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 
 import RequireAuth from './auth/RequireAuth.jsx'
 import './index.css'
-
+import Landing from './Landing.jsx'
 import Login from './Login.jsx'
 import Register from './Register.jsx'
 
@@ -20,6 +20,7 @@ function App() {
       />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/landing" element={<Landing />} />
     </Routes>
   )
 }
