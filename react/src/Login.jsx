@@ -27,9 +27,9 @@ export default function LoginPage({ onSwitchToRegister }) {
 		e.preventDefault()
 		setIsLoading(true)
 		localStorage.setItem('username', username)
-		const res = await loginUser(username, password)
-		if ('error' in res) {
-			console.log(res.error)
+		const errorMsg = await loginUser(username, password)
+		if (errorMsg) {
+			console.log(errorMsg);
 		}
 
 		// Simulate login process

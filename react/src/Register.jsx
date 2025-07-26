@@ -66,10 +66,9 @@ export default function RegisterPage({ onSwitchToLogin }) {
 			return
 		}
 
-		localStorage.setItem('username', formData.username)
-		const res = await createUser(formData.username, formData.email, formData.password);
-		if ('error' in res) {
-			console.log(res.error)
+		const errorMsg = await createUser(formData.username, formData.email, formData.password);
+		if (errorMsg) {
+			console.log(errorMsg);
 		}
 
 		setIsLoading(true)
