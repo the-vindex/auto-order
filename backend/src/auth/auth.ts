@@ -77,3 +77,11 @@ export function getUserIdFrom(req: express.Request) {
 	}
 	const userId = validateJWT(token, jwtSecret)
 }
+
+declare global {
+	namespace Express {
+		interface Request {
+			userId?: string;
+		}
+	}
+}
