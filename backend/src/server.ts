@@ -35,6 +35,8 @@ export function configureApp(app: express.Express) {
 	router.post('/product-reminders', authMiddleWare, validateWithSchema("product_reminder.schema.json"), createProductReminderApi);
 	router.get('/me', authMiddleWare, validateLoginApi)
 
+	router.get('/product-reminders', authMiddleWare, getAllProductRemindersForUserApi);
+
 	app.use('/api/v1', router);
 	app.use(errorMiddleWare);
 
