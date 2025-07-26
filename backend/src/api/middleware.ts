@@ -7,6 +7,7 @@ import {
 	UserNotAuthenticatedError,
 } from "./errors.js";
 import { respondWithError } from "./json.js";
+import { validateJWT } from "../auth/auth.js";
 
 export function errorMiddleWare(
 	err: Error,
@@ -40,3 +41,20 @@ export function errorMiddleWare(
 
 	respondWithError(res, statusCode, message);
 }
+
+export function authMiddleWare(req: Request, res: Response, next: NextFunction) {
+	try {
+		const token = req.cookies.token;
+		const jwtSecret = process.env.JWT_SECRET;
+		if (!jwtSecret) {
+			throw new Error("JWT_SECRET is not defined in environment variables.");
+		}
+		const userId = validateJWT(token, jwtSecret);
+		req.headers['user-id'] = userId;
+		next();
+	} catch (error) {
+		console.error("Error in jwt middleware", error)
+		throw error;
+	}
+}
+
