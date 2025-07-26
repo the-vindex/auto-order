@@ -72,8 +72,6 @@ function convertOrmToBusinessObject(input: Products.ProductReminder, newProduct:
         throw new Error(`Reminder creation failed, input data ${JSON.stringify(input)}`);
     }
 
-
-
     const result: Products.ProductReminder = {
         productId: newProduct.productId,
         reminderId: newReminder.reminderId,

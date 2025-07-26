@@ -2,6 +2,7 @@ import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {ProductReminderDto} from "../../src/api/dto/product_reminder.dto";
 import express from 'express';
+// @ts-ignore
 import {createAndLoginUser, createTestExpressInstance} from '../utils/auth_tools';
 
 
