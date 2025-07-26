@@ -25,6 +25,8 @@ const Home = () => {
   } = useQuery({
     queryKey: ['productReminders'],
     queryFn: getProductReminders,
+    refetchOnWindowFocus: false,
+    staleTime: 30000,
   })
 
   const displayData =
