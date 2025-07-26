@@ -128,4 +128,37 @@ fi
 
 log "E2E test completed successfully!"
 
+# 7. Delete the product reminder
+log "Deleting the product reminder..."
+DELETE_RESPONSE=$(curl -s -X DELETE "${BASE_URL}/product-reminders/${PRODUCT_ID}" \
+  -b "$COOKIE_JAR"
+)
+
+# Verify deletion was successful (HTTP 204 No Content or similar, or check for empty response)
+if [ -z "$DELETE_RESPONSE" ]; then
+  log "Product reminder deleted successfully."
+else
+  echo "[ERROR] Failed to delete product reminder. Response: $DELETE_RESPONSE"
+  exit 1
+fi
+
+# 8. Read all product reminders for the user after deletion to verify no products are left
+log "Reading all product reminders after deletion..."
+READ_REMINDERS_RESPONSE_AFTER_DELETE=$(curl -s -X GET "${BASE_URL}/product-reminders" \
+  -b "$COOKIE_JAR" \
+  -H "Accept: application/json"
+)
+
+log "All product reminders for user after deletion:\n$READ_REMINDERS_RESPONSE_AFTER_DELETE"
+
+# Verify the list of reminders is empty
+if echo "$READ_REMINDERS_RESPONSE_AFTER_DELETE" | jq -e '. | length == 0' > /dev/null; then
+  log "Successfully verified that no product reminders are left for the user."
+else
+  echo "[ERROR] Product reminders still found after deletion. Response: $READ_REMINDERS_RESPONSE_AFTER_DELETE"
+  exit 1
+fi
+
+log "E2E test completed successfully with creation, update, and deletion verification!"
+
 exit 0

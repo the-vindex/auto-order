@@ -1,6 +1,12 @@
 import express from "express";
 import { ProductReminderDto } from "./dto/product_reminder.dto";
-import {createProductReminder, getAllProductRemindersByUserId, Products, updateProductReminderDB} from "../db/queries/product_reminders";
+import {
+    createProductReminder,
+    deleteProductReminderDB,
+    getAllProductRemindersByUserId,
+    Products,
+    updateProductReminderDB
+} from "../db/queries/product_reminders";
 
 export async function getAllProductRemindersForUserApi(req: express.Request, res: express.Response) {
     const userId = req.userId || (req.headers['user-id'] as string);
@@ -101,6 +107,26 @@ export async function updateProductReminderApi(req: express.Request, res: expres
 
     console.debug(`Updated product reminder: ${JSON.stringify(productReminderUpdate)}`);
     res.status(200).json(updateResult);
+}
+
+export async function deleteProductReminderApi(req: express.Request, res: express.Response) {
+    const userId = req.userId || (req.headers['user-id'] as string);
+    if (!userId) {
+        return res.status(401).send("Unauthorized: No user ID found in request");
+    }
+
+    const productId = req.params.productId;
+    if (!productId) {
+        return res.status(400).send("Bad Request: No product ID found in request URL");
+    }
+
+    console.debug(`Deleting product reminder for user ${userId}, product ID: ${productId}`);
+
+    // Delete the product reminder
+    await deleteProductReminderDB(userId, productId);
+
+    console.debug(`Deleted product reminder for user ${userId}, product ID: ${productId}`);
+    res.status(204).send();
 }
 
 //////////////////////////////////// Utils functions ////////////////////////////////////

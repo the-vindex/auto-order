@@ -8,7 +8,7 @@ import { requestLogger } from './api/logger';
 import { authMiddleWare, errorMiddleWare } from './api/middleware';
 import cookieParser from 'cookie-parser';
 import {
-	createProductReminderApi,
+	createProductReminderApi, deleteProductReminderApi,
 	getAllProductRemindersForUserApi,
 	updateProductReminderApi
 } from "./api/productReminders";
@@ -41,6 +41,7 @@ export function configureApp(app: express.Express) {
 	router.post('/product-reminders', authMiddleWare, validateWithSchema("product_reminder.schema.json"), createProductReminderApi);
 	router.get('/product-reminders', authMiddleWare, getAllProductRemindersForUserApi);
 	router.put('/product-reminders/:productId', authMiddleWare, validateWithSchema("product_reminder.schema.json"), updateProductReminderApi);
+	router.delete('/product-reminders/:productId', authMiddleWare, deleteProductReminderApi);
 
 	app.use('/api/v1', router);
 	app.use(errorMiddleWare);
