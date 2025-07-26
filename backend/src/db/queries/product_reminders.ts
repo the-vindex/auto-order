@@ -1,6 +1,7 @@
 import {db} from "../index";
 import {productReminders, products} from "../schema";
 import ProductReminder = Products.ProductReminder;
+import {eq} from "drizzle-orm";
 
 export namespace Products {
     export type ProductReminder = {
@@ -84,4 +85,31 @@ function convertOrmToBusinessObject(input: Products.ProductReminder, newProduct:
         urls: input.urls
     };
     return result;
+}
+
+export async function getAllProductRemindersByUserId(userId: string): Promise<Products.ProductReminder[]> {
+    const result = await db.select({
+        productId: products.productId,
+        reminderId: productReminders.reminderId,
+        userId: products.userId,
+        name: products.name,
+        status: productReminders.status,
+        triggeredAt: productReminders.triggeredAt,
+        reminderDetails: productReminders.reminderDetails,
+        urls: products.urls
+    })
+        .from(productReminders)
+        .innerJoin(products, eq(productReminders.productId, products.productId))
+        .where(eq(products.userId, userId));
+
+    return result.map(row => ({
+        productId: row.productId,
+        reminderId: row.reminderId,
+        userId: row.userId,
+        name: row.name,
+        status: row.status,
+        triggeredAt: row.triggeredAt,
+        reminderDetails: row.reminderDetails as Products.ProductReminderDetails,
+        urls: row.urls
+    } as Products.ProductReminder));
 }
