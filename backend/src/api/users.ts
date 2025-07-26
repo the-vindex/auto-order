@@ -3,6 +3,7 @@ import { createUser, getAllUsers, getUserByEmail } from "../db/queries/user_quer
 import { makeJWT, setAuthCookie, validateJWT, verifyPassword } from "../auth/auth";
 import { respondWithError, respondWithJSON } from "./json";
 import { NotFoundError, UserAlreadyExistsError, UserNotAuthenticatedError } from "./errors";
+import { sendEmail } from "../notifier/notifier";
 
 export async function createUserApi(req: express.Request, res: express.Response) {
 	try {
@@ -80,5 +81,6 @@ export async function logoutUserApi(req: express.Request, res: express.Response)
 export async function validateLoginApi(req: express.Request, res: express.Response) {
 	const userId = req.headers['user-id'];
 	if (!userId) throw new UserNotAuthenticatedError('User is not logged in.');
+	sendEmail('', '');
 	respondWithJSON(res, 200, {});
 }
