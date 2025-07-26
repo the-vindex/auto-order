@@ -160,7 +160,7 @@ export async function updateProductReminderDB(userId: string, productId: string,
                 .set({
                     status: updates.status,
                     reminderDetails: updates.reminderDetails,
-                    triggeredAt: updates.triggeredAt
+//                    triggeredAt: updates.triggeredAt // it should be set only when the reminder is triggered
                 })
                 .where(eq(productReminders.productId, productId))
                 .returning();
@@ -182,4 +182,26 @@ export async function updateProductReminderDB(userId: string, productId: string,
 
     return updateProductReminderResult[0]; // Return the updated product reminder
 
+}
+
+export async function deleteProductReminderDB(userId: string, productId: string) {
+    console.debug(`Deleting product reminder for user ${userId}, product ID ${productId}`);
+
+    if (!productId) {
+        throw new Error("Product ID is required");
+    }
+
+    // Check if the product reminder exists
+    const existingReminder = await db.select().from(productReminders).where(eq(productReminders.productId, productId));
+    if (!existingReminder || existingReminder.length === 0) {
+        throw new Error(`Product reminder for product ID ${productId} not found`);
+    }
+
+    // Delete the product reminder
+    const deletedRows = await db.delete(productReminders).where(eq(productReminders.productId, productId)).returning();
+    if (deletedRows.length === 0) {
+        throw new Error(`Failed to delete product reminder for product ID ${productId}`);
+    }
+
+    console.debug(`Product reminder for product ID ${productId} deleted successfully`);
 }
