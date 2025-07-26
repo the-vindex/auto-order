@@ -16,7 +16,7 @@ export async function createUserApi(req: express.Request, res: express.Response)
 		const newUser = await createUser(name, email, password);
 
 		setAuthCookie(res, newUser.userId);
-		respondWithJSON(res, 201, {userId: newUser.userId});
+		respondWithJSON(res, 201, { userId: newUser.userId });
 	} catch (error: any) {
 		if (error?.cause?.code === '23505') {
 			throw new UserAlreadyExistsError('Email is already in use.');
@@ -37,6 +37,7 @@ export async function getAllUsersApi(req: express.Request, res: express.Response
 }
 
 export async function loginUserApi(req: express.Request, res: express.Response) {
+	console.log('logging in user.')
 	try {
 		const { email, password } = req.body;
 
@@ -62,6 +63,16 @@ export async function loginUserApi(req: express.Request, res: express.Response) 
 	}
 
 
+}
+
+export async function logoutUserApi(req: express.Request, res: express.Response) {
+	console.log('logging out user.')
+	res.clearCookie('token', {
+		httpOnly: true,
+		secure: false,
+		sameSite: 'strict',
+	});
+	respondWithJSON(res, 200, {});
 }
 
 export async function validateLoginApi(req: express.Request, res: express.Response) {
