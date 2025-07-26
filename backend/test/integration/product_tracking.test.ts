@@ -2,6 +2,7 @@ import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { ProductReminderDto } from "../../src/api/dto/product_reminder.dto";
 import express from 'express';
+// @ts-ignore
 import { createAndLoginUser, createTestExpressInstance } from '../utils/auth_tools';
 
 
@@ -85,6 +86,44 @@ describe('Product tracking API Integration Tests', () => {
 		expect(foundProductReminder).toBeDefined();
 		expect(foundProductReminder.name).toBe(newProductReminder.name);
 		expect(foundProductReminder.urls).toEqual(newProductReminder.urls);
+
+	});
+
+	it('should be able to PUT a product reminder', async () => {
+		const { newUser, authCookie } = await createAndLoginUser(app);
+		const productReminder = generateProductReminderData();
+		const result = await callApi_createProductReminder(app, productReminder, authCookie);
+		const newProductReminder = result.body;
+
+		const updatedReminderData = {
+			name: "Updated Test Product",
+			urls: ["https://example.com/updated-product1"],
+			reminderDetails: {
+				type: "targetDate",
+				targetDate: "2024-01-01",
+			}
+		} as ProductReminderDto.ProductReminder;
+
+		const putResult = await request(app)
+			.put(`/api/v1/product-reminders/${newProductReminder.productId}`)
+			.send(updatedReminderData)
+			.set('Cookie', authCookie) // Use the auth cookie to authenticate the request
+			.expect(200);
+
+		expect(putResult).toBeDefined
+		expect(putResult.body).toBeDefined();
+		expect(putResult.body).toHaveProperty('productId', newProductReminder.productId);
+		expect(putResult.body).toHaveProperty('name', updatedReminderData.name);
+		expect(putResult.body).toHaveProperty('urls', updatedReminderData.urls);
+		expect(putResult.body).toHaveProperty('status', 'active');
+		expect(putResult.body).toHaveProperty('reminderDetails');
+		const reminderDetails = updatedReminderData.reminderDetails;
+		if (reminderDetails.type === 'targetDate') {
+			expect(putResult.body.reminderDetails).toHaveProperty('type', reminderDetails.type);
+			expect(putResult.body.reminderDetails).toHaveProperty('targetDate', reminderDetails.targetDate);
+		} else {
+			throw new Error(`This shouldn't happen, Unsupported reminder type: ${reminderDetails.type}`);
+		}
 
 	});
 });

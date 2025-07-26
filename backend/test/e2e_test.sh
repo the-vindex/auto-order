@@ -80,20 +80,49 @@ fi
 
 log "Product reminder created successfully. Product ID: $PRODUCT_ID"
 
-# 5. Read all product reminders for the user
-log "Reading all product reminders..."
-READ_REMINDERS_RESPONSE=$(curl -s -X GET "${BASE_URL}/product-reminders" \
+# 5. Update the product reminder
+log "Updating the product reminder..."
+UPDATED_NAME="Updated_Test_Product_Reminder"
+UPDATE_PAYLOAD=$(cat <<EOF
+{
+  "name": "${UPDATED_NAME}",
+  "urls": ["https://example.com/product/updated/${RANDOM_SUFFIX}"],
+  "reminderDetails": {
+    "type": "targetDate",
+    "targetDate": "2026-01-01"
+  }
+}
+EOF
+)
+
+UPDATE_RESPONSE=$(curl -s -X PUT "${BASE_URL}/product-reminders/${PRODUCT_ID}" \
+  -H "Content-Type: application/json" \
+  -b "$COOKIE_JAR" \
+  -d "$UPDATE_PAYLOAD"
+)
+
+# Verify the update was successful (HTTP 200 OK)
+if echo "$UPDATE_RESPONSE" | jq -e '.productId == "'$PRODUCT_ID'"' > /dev/null; then
+  log "Product reminder updated successfully."
+else
+  echo "[ERROR] Failed to update product reminder. Response: $UPDATE_RESPONSE"
+  exit 1
+fi
+
+# 6. Read all product reminders for the user again to verify the update
+log "Reading all product reminders after update..."
+READ_REMINDERS_RESPONSE_AFTER_UPDATE=$(curl -s -X GET "${BASE_URL}/product-reminders" \
   -b "$COOKIE_JAR" \
   -H "Accept: application/json"
 )
 
-log "All product reminders for user:\n$READ_REMINDERS_RESPONSE"
+log "All product reminders for user after update:\n$READ_REMINDERS_RESPONSE_AFTER_UPDATE"
 
-# Optional: Add a basic check to ensure the created reminder is in the list
-if echo "$READ_REMINDERS_RESPONSE" | jq -e '.[] | select(.productId == "'"$PRODUCT_ID"'")' > /dev/null; then
-  log "Successfully found the created product reminder in the list."
+# Verify the updated reminder is in the list and has the new name
+if echo "$READ_REMINDERS_RESPONSE_AFTER_UPDATE" | jq -e '.[] | select(.productId == "'$PRODUCT_ID'" and .name == "'${UPDATED_NAME}'")' > /dev/null; then
+  log "Successfully found the updated product reminder with the new name in the list."
 else
-  echo "[ERROR] Created product reminder not found in the list of all reminders."
+  echo "[ERROR] Updated product reminder not found or name not updated in the list of all reminders."
   exit 1
 fi
 

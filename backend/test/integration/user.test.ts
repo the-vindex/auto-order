@@ -1,7 +1,9 @@
 import request from 'supertest';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
+// @ts-ignore
 import {generateTestUserObject} from "../utils/test_data_factories";
 import express from "express";
+// @ts-ignore
 import {createTestExpressInstance} from "../utils/auth_tools";
 
 describe('User API Integration Tests', () => {

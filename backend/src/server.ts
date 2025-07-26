@@ -7,7 +7,11 @@ import { validateWithSchema } from "./api/validateschema"
 import { requestLogger } from './api/logger';
 import { authMiddleWare, errorMiddleWare } from './api/middleware';
 import cookieParser from 'cookie-parser';
-import { createProductReminderApi, getAllProductRemindersForUserApi } from "./api/productReminders";
+import {
+	createProductReminderApi,
+	getAllProductRemindersForUserApi,
+	updateProductReminderApi
+} from "./api/productReminders";
 
 
 dotenv.config();
@@ -32,10 +36,11 @@ export function configureApp(app: express.Express) {
 
 	router.post('/logout', logoutUserApi)
 
-	router.post('/product-reminders', authMiddleWare, validateWithSchema("product_reminder.schema.json"), createProductReminderApi);
 	router.get('/me', authMiddleWare, validateLoginApi)
 
+	router.post('/product-reminders', authMiddleWare, validateWithSchema("product_reminder.schema.json"), createProductReminderApi);
 	router.get('/product-reminders', authMiddleWare, getAllProductRemindersForUserApi);
+	router.put('/product-reminders/:productId', authMiddleWare, validateWithSchema("product_reminder.schema.json"), updateProductReminderApi);
 
 	app.use('/api/v1', router);
 	app.use(errorMiddleWare);
