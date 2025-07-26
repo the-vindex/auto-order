@@ -50,11 +50,24 @@ jobs:
     - name: Create .env file
       run: cp .env.example .env
       working-directory: ./backend
-    - name: Run backend tests
-      run: npm test
+    - name: Run database migrations
+      run: npm run migrate
       working-directory: ./backend
       env:
         DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/auto_order?schema=public"
+    - name: Start backend server
+      run: npm start &
+      working-directory: ./backend
+      env:
+        DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/auto_order?schema=public"
+      # Give the server some time to start up
+    - name: Wait for backend server to be ready
+      run: sleep 10
+    - name: Run E2E tests
+      run: bash test/e2e_test.sh
+      working-directory: ./backend
+      env:
+        BASE_URL: "http://localhost:3000/api/v1"
 
   build-react:
     runs-on: ubuntu-latest
