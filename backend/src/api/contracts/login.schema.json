@@ -4,7 +4,7 @@
   "required": ["email", "password", "name"],
   "properties": {
     "name": {
-      "type": "string",
+      "type": "string"
     },
     "email": {
       "type": "string",
