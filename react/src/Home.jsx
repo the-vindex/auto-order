@@ -15,6 +15,7 @@ const Home = () => {
   // Dummy data for items (to be replaced by backend data)
   const [remindersData, setItems] = useState([
     {
+      id: 1,
       name: 'Soda',
       site: 'https://www.amazon.com',
       currentPrice: '279.99 €',
@@ -23,6 +24,8 @@ const Home = () => {
       reminderDate: '2025-09-01',
     },
     {
+      id: 2,
+
       name: 'T-Shirt',
       site: 'https://www.amazon.com',
       currentPrice: '279.99 €',
@@ -31,6 +34,7 @@ const Home = () => {
       reminderDate: '2025-09-01',
     },
     {
+      id: 3,
       name: 'Shoes',
       currentPrice: '279.99 €',
       discount: '-20.00 €',
