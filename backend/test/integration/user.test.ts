@@ -18,7 +18,7 @@ describe('User API Integration Tests', () => {
   it('should create a new user via POST /api/v1/users', async () => {
     const res = await request(app)
       .post('/api/v1/users')
-      .send({ name: 'Integration Test User' });
+      .send({ name: 'Integration Test User', email: 'integrate@test.com', password: 'testpassword' });
 
     expect(res.statusCode).toEqual(201);
     expect(res.body).toBeDefined();
@@ -39,5 +39,14 @@ describe('User API Integration Tests', () => {
     expect(res.body.length).toBeGreaterThanOrEqual(1);
     expect(res.body[0]).toHaveProperty('userId');
     expect(res.body[0]).toHaveProperty('name');
+  });
+
+  it('should validate json on create user and return 400 for invalid data', async () => {
+    const res = await request(app)
+      .post('/api/v1/users')
+      .send({ name: '', email: 'invalidemail', password: '' });
+
+    expect(res.statusCode).toEqual(400);
+    expect(res.text).toContain('{"errors":["instance.email does not conform to the \\"email\\" format","instance.password does not meet minimum length of 6"]}');
   });
 });

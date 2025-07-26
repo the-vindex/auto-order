@@ -7,13 +7,9 @@ export async function createUserApi(req: express.Request, res: express.Response)
 			return res.status(400).send('Bad Request: Missing request body');
 		}
 
-		if (!req.body.name) {
-			return res.status(400).send('Bad Request: Missing name');
-		}
-
 		const { name, email, password } = req.body;
 
-		const newUser = await createUser(name);
+		const newUser = await createUser(name, email, password);
 		res.status(201).json(newUser);
 	} catch (error) {
 		console.error('Error creating user:', error);
