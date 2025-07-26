@@ -16,7 +16,7 @@ export async function createUserApi(req: express.Request, res: express.Response)
 		const newUser = await createUser(name, email, password);
 
 		setAuthCookie(res, newUser.userId);
-		respondWithJSON(res, 201, {});
+		respondWithJSON(res, 201, {userId: newUser.userId});
 	} catch (error: any) {
 		if (error?.cause?.code === '23505') {
 			throw new UserAlreadyExistsError('Email is already in use.');

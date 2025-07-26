@@ -1,0 +1,79 @@
+{
+  "$id": "product_reminder.schema.json",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "reminderDetails": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/priceDropReminder"
+        },
+        {
+          "$ref": "#/definitions/targetDateReminder"
+        }
+      ]
+    },
+    "urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "productId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "triggered", "cancelled"],
+      "default": "active"
+    }
+  },
+  "required": ["name", "reminderDetails", "urls"],
+  "definitions": {
+    "money": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string"
+        }
+      },
+      "required": ["amount", "currency"]
+    },
+    "priceDropReminder": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "priceDrop"
+        },
+        "initialPrice": {
+          "$ref": "#/definitions/money"
+        },
+        "targetPrice": {
+          "$ref": "#/definitions/money"
+        }
+      },
+      "required": ["type", "initialPrice", "targetPrice"]
+    },
+    "targetDateReminder": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "targetDate"
+        },
+        "targetDate": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      "required": ["type", "targetDate"]
+    }
+  }
+}

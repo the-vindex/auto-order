@@ -44,6 +44,9 @@ jobs:
     - name: Build backend
       run: npm run build
       working-directory: ./backend
+    - name: Create .env file
+      run: cp .env.example .env
+      working-directory: ./backend
     - name: Run backend tests
       run: npm test
       working-directory: ./backend
