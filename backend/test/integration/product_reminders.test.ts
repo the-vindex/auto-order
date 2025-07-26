@@ -126,4 +126,30 @@ describe('Product tracking API Integration Tests', () => {
 		}
 
 	});
+
+	it('should allow deleting a product reminder', async () => {
+		const { newUser, authCookie } = await createAndLoginUser(app);
+		const productReminder = generateProductReminderData();
+		const result = await callApi_createProductReminder(app, productReminder, authCookie);
+		const newProductReminder = result.body;
+
+		const deleteResult = await request(app)
+			.delete(`/api/v1/product-reminders/${newProductReminder.productId}`)
+			.set('Cookie', authCookie) // Use the auth cookie to authenticate the request
+			.expect(204);
+
+		expect(deleteResult.statusCode).toBe(204);
+
+		// Verify that the reminder is deleted
+		const getResult = await request(app)
+			.get('/api/v1/product-reminders')
+			.set('Cookie', authCookie) // Use the auth cookie to authenticate the request
+			.set('Accept', 'application/json')
+			.expect(200);
+
+		expect(getResult.body).toBeDefined();
+		expect(getResult.body).toBeInstanceOf(Array);
+		const foundProductReminder = getResult.body.find((reminder: any) => reminder.productId === newProductReminder.productId);
+		expect(foundProductReminder).toBeUndefined();
+	});
 });
