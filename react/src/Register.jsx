@@ -1,38 +1,41 @@
 import React, { useState } from 'react'
-import { loginUser } from './api/user'
-import { error } from 'node:console'
+import { createUser } from './api/user'
 
-function Login() {
+function Register() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
+	const [confirmPassword, setConfirmPassword] = useState('')
 	const [isValid, setIsValid] = useState(true)
+	const [errorMessage, setErrorMessage] = useState('')
 
-	const handleUsernameChange = e => {
-		setUsername(e.target.value)
-	}
-
-	const handlePasswordChange = e => {
-		setPassword(e.target.value)
-	}
+	const handleUsernameChange = e => setUsername(e.target.value)
+	const handlePasswordChange = e => setPassword(e.target.value)
+	const handleConfirmPasswordChange = e => setConfirmPassword(e.target.value)
 
 	const handleSubmit = e => {
 		e.preventDefault()
-		if (username.trim() && password.trim()) {
-			setIsValid(true)
-			localStorage.setItem('username', username)
-			const err = loginUser(username, password)
-			//TODO can display the error message here
-			//should probably update this to use try catch blocks even tho they stupid
-			if (err) console.log(error)
-		} else {
+		if (!username.trim() || !password.trim() || !confirmPassword.trim()) {
 			setIsValid(false)
+			setErrorMessage('All fields are required.')
+			return
 		}
+
+		if (password !== confirmPassword) {
+			setIsValid(false)
+			setErrorMessage('Passwords do not match.')
+			return
+		}
+
+		setIsValid(true)
+		localStorage.setItem('username', username)
+		const response = createUser("TEST NAME", username, password)
+		console.log(response)
 	}
 
 	return (
 		<div className="flex items-center justify-center min-h-screen">
 			<div className="bg-white p-8 rounded shadow-md w-full max-w-sm">
-				<h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+				<h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
 				<form onSubmit={handleSubmit}>
 					<div className="mb-4">
 						<label className="block text-gray-700 mb-2" htmlFor="username">
@@ -40,7 +43,7 @@ function Login() {
 						</label>
 						<input
 							className="w-full px-3 py-2 border rounded"
-							type="text"
+							type="email"
 							id="username"
 							value={username}
 							onChange={handleUsernameChange}
@@ -58,9 +61,21 @@ function Login() {
 							onChange={handlePasswordChange}
 						/>
 					</div>
+					<div className="mb-4">
+						<label className="block text-gray-700 mb-2" htmlFor="confirmPassword">
+							Confirm Password
+						</label>
+						<input
+							className="w-full px-3 py-2 border rounded"
+							type="password"
+							id="confirmPassword"
+							value={confirmPassword}
+							onChange={handleConfirmPasswordChange}
+						/>
+					</div>
 					{!isValid && (
 						<div className="mb-4 text-red-500 text-center">
-							Username and password are required.
+							{errorMessage}
 						</div>
 					)}
 					<button
@@ -74,4 +89,4 @@ function Login() {
 	)
 }
 
-export default Login
+export default Register
