@@ -5,7 +5,7 @@ import {Pool} from 'pg';
 
 import 'dotenv/config';
 import {createUser} from "../../src/db/queries/user_queries";
-import {createProductTracking, Products} from "../../src/db/queries/product_reminders";
+import {createProductReminder, Products} from "../../src/db/queries/product_reminders";
 import {users} from "../../src/db/schema";
 import {generateTestUserObject} from "../utils/test_data_factories";
 
@@ -43,7 +43,7 @@ describe('Product Database Tests', () => {
         } as Products.ProductReminder;
 
         // Assuming you have a function to create a product reminder
-        const result: Products.ProductReminder = await createProductTracking(productReminder);
+        const result: Products.ProductReminder = await createProductReminder(productReminder);
 
         expect(result).toBeDefined();
         expect(result.userId).toBe(productReminder.userId);

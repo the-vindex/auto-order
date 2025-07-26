@@ -1,5 +1,7 @@
 import { Validator } from 'jsonschema';
 import { Request, Response, NextFunction } from 'express';
+import fs from 'fs';
+import path from 'path';
 
 const v = new Validator();
 
@@ -7,12 +9,13 @@ const v = new Validator();
 const schemaCache: { [key: string]: object } = {};
 
 export function validateWithSchema(schemaName: string) {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!schemaCache[schemaName]) {
-        // Dynamically import the schema. The path is relative to the current file.
-        const schema = await import(`./contracts/${schemaName}`);
-        schemaCache[schemaName] = schema.default;
+        // __dirname is safe and available in the CommonJS environment that ts-node uses
+        const schemaPath = path.join(__dirname, 'contracts', schemaName);
+        const schemaData = fs.readFileSync(schemaPath, 'utf8');
+        schemaCache[schemaName] = JSON.parse(schemaData);
       }
 
       const schema = schemaCache[schemaName];

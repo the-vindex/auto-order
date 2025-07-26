@@ -6,7 +6,7 @@ import {generateTestUserObject} from "../utils/test_data_factories";
 import {ProductReminderDto} from "../../src/api/dto/product_reminder.dto";
 import {fakeAuth} from "../../src/auth/fakeAuth";
 import express from 'express';
-import { createExpressAppWithFakeAuth } from '../utils/fakeAuthExpress';
+import {createAndLoginUser, createExpressAppWithFakeAuth} from '../utils/fakeAuthExpress';
 import {Products} from "../../src/db/queries/product_reminders";
 
 
@@ -24,9 +24,7 @@ describe('Product tracking API Integration Tests', () => {
     });
 
     it('should create a new product tracking record via POST /api/v1/product-tracking', async () => {
-        const newUserData = generateTestUserObject();
-
-        let newUser = await createUser(newUserData.name, newUserData.email, newUserData.password);
+        const {newUser, authCookie} = await createAndLoginUser(app);
 
         const productReminderData = {
             name: "Test Product",
@@ -40,7 +38,7 @@ describe('Product tracking API Integration Tests', () => {
         let result = await request(app)
             .post('/api/v1/product-reminders')
             .send(productReminderData)
-            .set('X-Fake-User-Id', newUser.userId)
+            .set('Cookie', authCookie) // Use the auth cookie to authenticate the request
             .set('Accept', 'application/json')
 //            .expect('Content-Type', /json/)
             .expect(201)
