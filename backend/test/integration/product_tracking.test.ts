@@ -1,32 +1,32 @@
 import request from 'supertest';
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import {configureApp} from '../../src/server';
-import {createUser} from "../../src/db/queries/user_queries";
-import {generateTestUserObject} from "../utils/test_data_factories";
+import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {ProductReminderDto} from "../../src/api/dto/product_reminder.dto";
-import {fakeAuth} from "../../src/auth/fakeAuth";
 import express from 'express';
-import { createExpressAppWithFakeAuth } from '../utils/fakeAuthExpress';
-import {Products} from "../../src/db/queries/product_reminders";
-
+import {createAndLoginUser, createExpressAppWithFakeAuth} from '../utils/fakeAuthExpress';
 
 
 describe('Product tracking API Integration Tests', () => {
     let app: express.Express;
+    const createdUserIds: string[] = [];
+
     beforeAll(async () => {
-        // You might want to clear the database or seed it before running tests
-        // For now, we'll just ensure the app is ready.
         app = createExpressAppWithFakeAuth();
     });
 
     afterAll(async () => {
-
+        if (createdUserIds.length > 0) {
+            const { inArray } = await import('drizzle-orm');
+            const { users } = await import('../../src/db/schema');
+            const { db } = await import('../../src/db');
+            await db.delete(users).where(inArray(users.userId, createdUserIds));
+        }
     });
 
     it('should create a new product tracking record via POST /api/v1/product-tracking', async () => {
-        const newUserData = generateTestUserObject();
+        let { newUser, authCookie } = await createAndLoginUser(app);
+        createdUserIds.push(newUser.userId); // Track the created user
 
-        let newUser = await createUser(newUserData.name, newUserData.email, newUserData.password);
+        console.log(newUser.userId);
 
         const productReminderData = {
             name: "Test Product",
@@ -40,9 +40,8 @@ describe('Product tracking API Integration Tests', () => {
         let result = await request(app)
             .post('/api/v1/product-reminders')
             .send(productReminderData)
-            .set('X-Fake-User-Id', newUser.userId)
             .set('Accept', 'application/json')
-//            .expect('Content-Type', /json/)
+            .set('Cookie', authCookie) // Use the auth cookie from login
             .expect(201)
 
         expect(result).toBeDefined();

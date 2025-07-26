@@ -40,7 +40,7 @@ type ProductResultSet = typeof products.$inferSelect;
 type ProductReminderResultSet = typeof productReminders.$inferSelect;
 
 
-export async function createProductTracking(productReminder: Products.ProductReminder) {
+export async function createProductReminder(productReminder: Products.ProductReminder) {
     return await db.transaction(async (tx) => {
             // Insert product
             const [product] = await tx.insert(products).values({

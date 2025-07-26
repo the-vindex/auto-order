@@ -1,13 +1,15 @@
 import express from "express";
 import { ProductReminderDto } from "./dto/product_reminder.dto";
-import {createProductTracking, Products} from "../db/queries/product_reminders";
+import {createProductReminder, Products} from "../db/queries/product_reminders";
 
 
 export async function createProductReminderApi(req: express.Request, res: express.Response) {
-    const userId = req.userId;
+    const userId = req.userId || (req.headers['user-id'] as string);
     if (!userId) {
         return res.status(401).send("Unauthorized: No user ID found in request");
     }
+
+    console.debug(`Creating product reminder for user ${userId}, request body: ${JSON.stringify(req.body)}`);
 
     const productTrackingRequest: ProductReminderDto.ProductReminder = req.body;
 
@@ -20,7 +22,10 @@ export async function createProductReminderApi(req: express.Request, res: expres
         reminderDetails: productTrackingRequest.reminderDetails as Products.ProductReminderDetails
     }
 
-    let newProductReminder = await createProductTracking(productReminder);
+    let newProductReminder = await createProductReminder(productReminder);
+    if (!newProductReminder) {
+        return res.status(500).send("Internal Server Error: Could not create product reminder");
+    }
 
     let newProductReminderDto: ProductReminderDto.ProductReminder = {
         productId: newProductReminder.productId,
@@ -30,5 +35,6 @@ export async function createProductReminderApi(req: express.Request, res: expres
         reminderDetails: newProductReminder.reminderDetails as ProductReminderDto.ReminderDetails
     }
 
+    console.debug(`Created product reminder: ${JSON.stringify(newProductReminderDto)}`);
     res.status(201).json(newProductReminderDto);
 }

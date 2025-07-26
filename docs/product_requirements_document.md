@@ -27,9 +27,7 @@ Shoppers juggle wish‑lists, seasonal deals, and fluctuating prices across mult
 ## 4. Key User Scenarios
 
 1. **Schedule‑Based Reminder**\
-   • User pastes product URL → chooses "remind me in X days/weeks".\
-   • System stores item, sets timer, sends push/email at due time.\
-   **Architecture:** DB entity `product_tracking`, job scheduler, notification service, basic auth (email/password or Magic Link/Auth0).
+   • User pastes product URL → chooses "remind me in X days/weeks".\n   • System stores item, sets timer, sends push/email at due time.\n   **Architecture:** DB entity `product_reminders`, job scheduler, notification service, basic auth (email/password or Magic Link/Auth0).
 2. **Price‑Drop Reminder (single site)**\
    • User pastes supported URL → system scrapes current price.\
    • If future scrape returns lower price, notify.\
@@ -105,15 +103,15 @@ Shoppers juggle wish‑lists, seasonal deals, and fluctuating prices across mult
 ```
 User { id, email, created_at }
 SiteConfig { id, domain, script_name, enabled }
-ProductTracking {
+ProductReminder {
   id, user_id, url, site_id,
   reminder_type ENUM('time','price'),
   trigger_at TIMESTAMP, target_price DECIMAL,
   initial_price DECIMAL, currency,
   status ENUM('active','notified','cancelled')
 }
-PriceSample { id, tracking_id, sampled_at, price }
-NotificationLog { id, tracking_id, sent_at, channel }
+PriceSample { id, reminder_id, sampled_at, price }
+NotificationLog { id, reminder_id, sent_at, channel }
 ```
 
 ---
@@ -291,7 +289,7 @@ All endpoints are prefixed with `/v1` and require a Bearer JWT obtained via the
 | -------- | --------------------- | ----------------------------- | ---------------- | ---------------------------------------- |
 | **GET**  | `/merchants`          | List supported merchants      | —                | array                                    |
 | **GET**  | `/merchants/support`  | Check if URL is supported     | `?url=https://…` | `{ supported, merchant_id }`             |
-| **POST** | `/trackings/validate` | Scrape URL once & return meta | `{ url }`        | `{ supported, merchant, current_price }` |
+| **POST** | `/reminders/validate` | Scrape URL once & return meta | `{ url }`        | `{ supported, merchant, current_price }` |
 
 ### 15.4 Product Tracking (combined item + reminder)
 
