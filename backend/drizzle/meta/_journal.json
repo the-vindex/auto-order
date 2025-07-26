@@ -15,6 +15,13 @@
       "when": 1753467590393,
       "tag": "0001_massive_bastion",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1753486321782,
+      "tag": "0002_cooing_puff_adder",
+      "breakpoints": true
     }
   ]
 }
