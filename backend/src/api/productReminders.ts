@@ -2,7 +2,7 @@ import express from "express";
 import { ProductReminderDto } from "./dto/product_reminder.dto";
 import {createProductReminder, getAllProductRemindersByUserId, Products} from "../db/queries/product_reminders";
 
-export async function getAllProductRemindersForUser(req: express.Request, res: express.Response) {
+export async function getAllProductRemindersForUserApi(req: express.Request, res: express.Response) {
     const userId = req.userId || (req.headers['user-id'] as string);
     if (!userId) {
         return res.status(401).send("Unauthorized: No user ID found in request");
