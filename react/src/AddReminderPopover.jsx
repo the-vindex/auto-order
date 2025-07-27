@@ -15,48 +15,80 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
   const [formData, setFormData] = useState({
     name: '',
     urls: [],
-    reminderType: 'priceDrop',
-    initialPrice: 100,
+    initialPrice: 1000,
     targetPrice: 80,
     currency: 'USD',
-    targetDate: '',
   })
   const [urlInput, setUrlInput] = useState('')
+  const [urlError, setUrlError] = useState('')
 
-  const handleSubmit = () => {
+  const isAmazonUrl = url => {
+    try {
+      const urlObj = new URL(url)
+      return urlObj.hostname.includes('amazon')
+    } catch {
+      return false
+    }
+  }
+
+  const handleSubmit = async () => {
     const newReminderData = {
       name: formData.name,
       urls: formData.urls,
-      reminderDetails:
-        formData.reminderType === 'priceDrop'
-          ? {
-              type: 'priceDrop',
-              initialPrice: {
-                amount: parseFloat(formData.initialPrice),
-                currency: formData.currency,
-              },
-              targetPrice: {
-                amount: parseFloat(formData.targetPrice),
-                currency: formData.currency,
-              },
-            }
-          : {
-              type: 'targetDate',
-              targetDate: formData.targetDate,
-            },
+      reminderDetails: {
+        type: 'priceDrop',
+        initialPrice: {
+          amount: parseFloat(formData.initialPrice),
+          currency: formData.currency,
+        },
+        targetPrice: {
+          amount: parseFloat(formData.targetPrice),
+          currency: formData.currency,
+        },
+      },
     }
 
-    onSubmit(newReminderData)
+    try {
+      await onSubmit(newReminderData)
+      setFormData({
+        name: '',
+        urls: [],
+        initialPrice: 1000,
+        targetPrice: 80,
+        currency: 'USD',
+      })
+      setUrlInput('')
+      setUrlError('')
+      setIsPopoverOpen(false)
+    } catch (err) {
+      console.error('Failed to create reminder:', err)
+    }
   }
 
   const addUrl = () => {
-    if (urlInput.trim() && !formData.urls.includes(urlInput.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        urls: [...prev.urls, urlInput.trim()],
-      }))
-      setUrlInput('')
+    const trimmedUrl = urlInput.trim()
+
+    if (!trimmedUrl) {
+      setUrlError('Please enter a URL')
+      return
     }
+
+    if (!isAmazonUrl(trimmedUrl)) {
+      setUrlError('Only Amazon URLs are allowed')
+      return
+    }
+
+    if (formData.urls.includes(trimmedUrl)) {
+      setUrlError('This URL has already been added')
+      return
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      urls: [...prev.urls, trimmedUrl],
+    }))
+    setUrlInput('')
+    setUrlError('')
   }
 
   const removeUrl = urlToRemove => {
@@ -73,8 +105,31 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
     }
   }
 
+  const handleUrlInputChange = e => {
+    setUrlInput(e.target.value)
+    if (urlError) {
+      setUrlError('')
+    }
+  }
+
+  const handlePopoverChange = open => {
+    setIsPopoverOpen(open)
+
+    if (!open) {
+      setFormData({
+        name: '',
+        urls: [],
+        initialPrice: 1000,
+        targetPrice: 80,
+        currency: 'USD',
+      })
+      setUrlInput('')
+      setUrlError('')
+    }
+  }
+
   return (
-    <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+    <Popover open={isPopoverOpen} onOpenChange={handlePopoverChange}>
       <PopoverTrigger asChild>
         <Button className="bg-blue-600 hover:bg-blue-700">
           <Plus className="h-4 w-4 mr-2" />
@@ -87,7 +142,7 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
             <div className="space-y-2">
               <h4 className="font-medium leading-none">New Reminder</h4>
               <p className="text-sm text-muted-foreground">
-                Create a new product reminder
+                Create a new price drop reminder
               </p>
             </div>
 
@@ -107,14 +162,15 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
 
               {/* URLs Input */}
               <div className="grid gap-2">
-                <Label htmlFor="urls">Product URLs</Label>
+                <Label htmlFor="urls">Amazon Product URLs</Label>
                 <div className="flex gap-2">
                   <Input
                     id="urls"
-                    placeholder="Enter URL and press Enter"
+                    placeholder="Enter Amazon URL and press Enter"
                     value={urlInput}
-                    onChange={e => setUrlInput(e.target.value)}
+                    onChange={handleUrlInputChange}
                     onKeyPress={handleKeyPress}
+                    className={urlError ? 'border-red-500' : ''}
                   />
                   <Button
                     type="button"
@@ -124,157 +180,65 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
                     Add
                   </Button>
                 </div>
+                {urlError && <p className="text-red-500 text-xs">{urlError}</p>}
                 {formData.urls.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {formData.urls.map((url, index) => (
                       <Badge
                         key={index}
                         variant="secondary"
-                        className="flex items-center gap-1">
-                        {url}
-                        <X
-                          className="h-3 w-3 cursor-pointer"
-                          onClick={() => removeUrl(url)}
-                        />
+                        onClick={() => removeUrl(url)}
+                        className="flex items-center gap-1 cursor-pointer hover:bg-gray-200">
+                        <span className="max-w-[200px] truncate">{url}</span>
+                        <X className="h-3 w-3" />
                       </Badge>
                     ))}
                   </div>
                 )}
               </div>
 
-              {/* Reminder Type */}
+              {/* Currency */}
               <div className="grid gap-2">
-                <Label>Reminder Type</Label>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant={
-                      formData.reminderType === 'priceDrop'
-                        ? 'default'
-                        : 'outline'
-                    }
-                    size="sm"
-                    onClick={() =>
-                      setFormData(prev => ({
-                        ...prev,
-                        reminderType: 'priceDrop',
-                      }))
-                    }>
-                    Price Drop
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={
-                      formData.reminderType === 'targetDate'
-                        ? 'default'
-                        : 'outline'
-                    }
-                    size="sm"
-                    onClick={() =>
-                      setFormData(prev => ({
-                        ...prev,
-                        reminderType: 'targetDate',
-                      }))
-                    }>
-                    Target Date
-                  </Button>
-                </div>
+                <Label htmlFor="currency">Currency</Label>
+                <select
+                  id="currency"
+                  value={formData.currency}
+                  onChange={e =>
+                    setFormData(prev => ({
+                      ...prev,
+                      currency: e.target.value,
+                    }))
+                  }
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+                  <option value="USD">USD ($)</option>
+                </select>
               </div>
 
-              {/* Price Drop Fields */}
-              {formData.reminderType === 'priceDrop' && (
-                <>
-                  <div className="grid gap-2">
-                    <Label htmlFor="currency">Currency</Label>
-                    <select
-                      id="currency"
-                      value={formData.currency}
-                      onChange={e =>
-                        setFormData(prev => ({
-                          ...prev,
-                          currency: e.target.value,
-                        }))
-                      }
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                      <option value="USD">USD ($)</option>
-                      <option value="GBP">GBP (£)</option>
-                    </select>
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="initialPrice">
-                      Initial Price ({formData.currency === 'USD' ? '$' : '£'})
-                    </Label>
-                    <Input
-                      id="initialPrice"
-                      type="number"
-                      min="1"
-                      max="1000"
-                      step="0.01"
-                      value={formData.initialPrice}
-                      onChange={e => {
-                        const value = parseFloat(e.target.value) || 0
-                        setFormData(prev => ({
-                          ...prev,
-                          initialPrice: value,
-                          targetPrice: Math.min(prev.targetPrice, value),
-                        }))
-                      }}
-                    />
-                  </div>
-
-                  <div className="grid gap-2">
-                    <Label htmlFor="targetPrice">
-                      Target Price ({formData.currency === 'USD' ? '$' : '£'})
-                    </Label>
-                    <Input
-                      id="targetPrice"
-                      type="number"
-                      min="1"
-                      max={formData.initialPrice}
-                      step="0.01"
-                      value={formData.targetPrice}
-                      onChange={e => {
-                        const value = parseFloat(e.target.value) || 0
-                        setFormData(prev => ({
-                          ...prev,
-                          targetPrice: Math.min(value, prev.initialPrice),
-                        }))
-                      }}
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* Target Date Field */}
-              {formData.reminderType === 'targetDate' && (
-                <div className="grid gap-2">
-                  <Label htmlFor="targetDate">Target Date</Label>
-                  <Input
-                    id="targetDate"
-                    type="date"
-                    value={formData.targetDate}
-                    onChange={e =>
-                      setFormData(prev => ({
-                        ...prev,
-                        targetDate: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              )}
+              {/* Target Price */}
+              <div className="grid gap-2">
+                <Label htmlFor="targetPrice">Target Price ($)</Label>
+                <Input
+                  id="targetPrice"
+                  type="number"
+                  min="1"
+                  max={formData.initialPrice}
+                  step="0.01"
+                  value={formData.targetPrice}
+                  onChange={e => {
+                    const value = parseFloat(e.target.value) || 0
+                    setFormData(prev => ({
+                      ...prev,
+                      targetPrice: Math.min(value, prev.initialPrice),
+                    }))
+                  }}
+                />
+              </div>
 
               {/* Submit Button */}
               <Button
                 onClick={handleSubmit}
                 disabled={
-                  isLoading ||
-                  !formData.name ||
-                  formData.urls.length === 0 ||
-                  (formData.reminderType === 'priceDrop' &&
-                    formData.initialPrice <= formData.targetPrice) ||
-                  (formData.reminderType === 'targetDate' &&
-                    !formData.targetDate)
+                  isLoading || !formData.name || formData.urls.length === 0
                 }>
                 {isLoading ? 'Creating...' : 'Create Reminder'}
               </Button>

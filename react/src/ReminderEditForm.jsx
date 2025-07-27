@@ -8,15 +8,41 @@ import { useState } from 'react'
 export function ReminderEditForm({ initialData, onSubmit, isLoading, error }) {
   const [formData, setFormData] = useState(initialData)
   const [urlInput, setUrlInput] = useState('')
+  const [urlError, setUrlError] = useState('')
+
+  const isAmazonUrl = url => {
+    try {
+      const urlObj = new URL(url)
+      return urlObj.hostname.includes('amazon')
+    } catch {
+      return false
+    }
+  }
 
   const addUrl = () => {
-    if (urlInput.trim() && !formData.urls.includes(urlInput.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        urls: [...prev.urls, urlInput.trim()],
-      }))
-      setUrlInput('')
+    const trimmedUrl = urlInput.trim()
+
+    if (!trimmedUrl) {
+      setUrlError('Please enter a URL')
+      return
     }
+
+    if (!isAmazonUrl(trimmedUrl)) {
+      setUrlError('Only Amazon URLs are allowed')
+      return
+    }
+
+    if (formData.urls.includes(trimmedUrl)) {
+      setUrlError('This URL has already been added')
+      return
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      urls: [...prev.urls, trimmedUrl],
+    }))
+    setUrlInput('')
+    setUrlError('')
   }
 
   const removeUrl = urlToRemove => {
@@ -30,6 +56,13 @@ export function ReminderEditForm({ initialData, onSubmit, isLoading, error }) {
     if (e.key === 'Enter') {
       e.preventDefault()
       addUrl()
+    }
+  }
+
+  const handleUrlInputChange = e => {
+    setUrlInput(e.target.value)
+    if (urlError) {
+      setUrlError('')
     }
   }
 
@@ -53,70 +86,35 @@ export function ReminderEditForm({ initialData, onSubmit, isLoading, error }) {
 
       {/* URLs Input */}
       <div className="grid gap-2">
-        <Label htmlFor="urls">Product URLs</Label>
+        <Label htmlFor="urls">Amazon Product URLs</Label>
         <div className="flex gap-2">
           <Input
             id="urls"
-            placeholder="Enter URL and press Enter"
+            placeholder="Enter Amazon URL and press Enter"
             value={urlInput}
-            onChange={e => setUrlInput(e.target.value)}
+            onChange={handleUrlInputChange}
             onKeyPress={handleKeyPress}
+            className={urlError ? 'border-red-500' : ''}
           />
           <Button type="button" variant="outline" size="sm" onClick={addUrl}>
             Add
           </Button>
         </div>
+        {urlError && <p className="text-red-500 text-xs">{urlError}</p>}
         {formData.urls.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {formData.urls.map((url, index) => (
               <Badge
                 key={index}
                 variant="secondary"
-                className="flex items-center gap-1">
-                {url}
-                <X
-                  className="h-3 w-3 cursor-pointer"
-                  onClick={() => removeUrl(url)}
-                />
+                className="flex items-center gap-1 cursor-pointer hover:bg-gray-200"
+                onClick={() => removeUrl(url)}>
+                <span className="max-w-[200px] truncate">{url}</span>
+                <X className="h-3 w-3" />
               </Badge>
             ))}
           </div>
         )}
-      </div>
-
-      {/* Reminder Type */}
-      <div className="grid gap-2">
-        <Label>Reminder Type</Label>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant={
-              formData.reminderType === 'priceDrop' ? 'default' : 'outline'
-            }
-            size="sm"
-            onClick={() =>
-              setFormData(prev => ({
-                ...prev,
-                reminderType: 'priceDrop',
-              }))
-            }>
-            Price Drop
-          </Button>
-          <Button
-            type="button"
-            variant={
-              formData.reminderType === 'targetDate' ? 'default' : 'outline'
-            }
-            size="sm"
-            onClick={() =>
-              setFormData(prev => ({
-                ...prev,
-                reminderType: 'targetDate',
-              }))
-            }>
-            Target Date
-          </Button>
-        </div>
       </div>
 
       {/* Price Drop Fields */}
@@ -135,36 +133,11 @@ export function ReminderEditForm({ initialData, onSubmit, isLoading, error }) {
               }
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
               <option value="USD">USD ($)</option>
-              <option value="GBP">GBP (£)</option>
             </select>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="initialPrice">
-              Initial Price ({formData.currency === 'USD' ? '$' : '£'})
-            </Label>
-            <Input
-              id="initialPrice"
-              type="number"
-              min="1"
-              max="1000"
-              step="0.01"
-              value={formData.initialPrice}
-              onChange={e => {
-                const value = parseFloat(e.target.value) || 0
-                setFormData(prev => ({
-                  ...prev,
-                  initialPrice: value,
-                  targetPrice: Math.min(prev.targetPrice, value),
-                }))
-              }}
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="targetPrice">
-              Target Price ({formData.currency === 'USD' ? '$' : '£'})
-            </Label>
+            <Label htmlFor="targetPrice">Target Price ($)</Label>
             <Input
               id="targetPrice"
               type="number"
@@ -184,24 +157,6 @@ export function ReminderEditForm({ initialData, onSubmit, isLoading, error }) {
         </>
       )}
 
-      {/* Target Date Field */}
-      {formData.reminderType === 'targetDate' && (
-        <div className="grid gap-2">
-          <Label htmlFor="targetDate">Target Date</Label>
-          <Input
-            id="targetDate"
-            type="date"
-            value={formData.targetDate}
-            onChange={e =>
-              setFormData(prev => ({
-                ...prev,
-                targetDate: e.target.value,
-              }))
-            }
-          />
-        </div>
-      )}
-
       {/* Submit Button */}
       <Button
         onClick={() => onSubmit(formData)}
@@ -210,8 +165,7 @@ export function ReminderEditForm({ initialData, onSubmit, isLoading, error }) {
           !formData.name ||
           formData.urls.length === 0 ||
           (formData.reminderType === 'priceDrop' &&
-            formData.initialPrice <= formData.targetPrice) ||
-          (formData.reminderType === 'targetDate' && !formData.targetDate)
+            formData.initialPrice <= formData.targetPrice)
         }>
         {isLoading ? 'Updating...' : 'Update Reminder'}
       </Button>
