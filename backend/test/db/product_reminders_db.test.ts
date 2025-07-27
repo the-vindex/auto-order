@@ -7,6 +7,7 @@ import 'dotenv/config';
 import {createUser} from "../../src/db/queries/user_queries";
 import {createProductReminder, Products} from "../../src/db/queries/product_reminders";
 import {users} from "../../src/db/schema";
+// @ts-ignore
 import {generateTestUserObject} from "../utils/test_data_factories";
 
 const pool = new Pool({

@@ -4,6 +4,7 @@ import {migrate} from 'drizzle-orm/node-postgres/migrator';
 import {Pool} from 'pg';
 import {users} from '../../src/db/schema';
 import {createUser, deleteUserById, getUserById} from "../../src/db/queries/user_queries";
+// @ts-ignore
 import {generateTestUserObject} from "../utils/test_data_factories";
 
 describe('Users Database Tests', () => {

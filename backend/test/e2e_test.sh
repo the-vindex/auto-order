@@ -44,7 +44,7 @@ fi
 
 
 # Check that registration was successful (HTTP 201 Created and returns user data)
-USER_ID=$(echo "$REGISTRATION_RESPONSE" | jq -r '.userId')
+USER_ID=$(echo "$REGISTRATION_RESPONSE" | jq -r '.email')
 if [ -z "$USER_ID" ] || [ "$USER_ID" == "null" ]; then
   echo "[ERROR] User registration failed. Response: $REGISTRATION_RESPONSE"
   exit 1
