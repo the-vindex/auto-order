@@ -1,15 +1,65 @@
 # Auto-Order alias Timely Buyer (tm) - Product Reminder and Ordering App
+Track sales on your favorite items, all in one place!
+TODO: ADD AN IMAGE OF THE SITE HERE
 
-## 1. Introduction
+## Motivation
 
-Auto-Order is an application designed to help users manage product reminders and potentially automate ordering processes. It consists of a backend API and a React frontend.
+Online shoppers often come across products they want but prefer to wait for a sale before purchasing. This project was built to centralize and track those "wait-for-a-sale" items in one place. Users can register products, set a target price, and receive a notification when the item's price drops below their specified threshold — helping them buy at the right time without constantly checking for deals.
 
-## 2. Tech Stack
+## Quick Start
 
-*   **Backend:** Node.js, Express.js, TypeScript, Drizzle ORM, PostgreSQL
-*   **Frontend:** React, Vite
+### Database Setup
+
+1.  Navigate to the backend directory:
+
+
+### Backend Development
+
+1.  Navigate to the backend directory:
+    ```bash
+    cd auto-order/backend
+    ```
+2.  Create a `.env` file from the example. This file will hold your local environment variables, including the database URL and JWT secret.
+    ```bash
+    cp .env.example .env
+    # Edit .env with your local database connection string and JWT_SECRET
+    ```
+3.  Start the database with docker compose:
+   ```bash
+   docker compose up -d
+   ```
+3.  Install backend dependencies:
+    ```bash
+    npm install
+    ```
+4.  Start the backend in development mode:
+    ```bash
+    npm run dev
+    ```
+    The backend will run on `http://localhost:3000` (or the port specified in your `.env`).
+
+### Frontend Development
+
+1.  Navigate to the React frontend directory:
+    ```bash
+    cd auto-order/react
+    ```
+2.  Install frontend dependencies:
+    ```bash
+    npm install
+    ```
+3.  Start the frontend development server:
+    ```bash
+    npm run dev
+    ```
+    The frontend will typically run on `http://localhost:5173`.
+
+## Tech Stack
+
+*   **Backend:** Node.js, Express.js
+*   **Frontend:** React
 *   **Database:** PostgreSQL
-*   **Containerization:** Docker, Docker Compose
+*   **Containerization:** Docker
 
 ## 3. How to Start in Production
 
