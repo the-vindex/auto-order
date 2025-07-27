@@ -69,13 +69,27 @@ export async function loginUserApi(req: express.Request, res: express.Response) 
 
 export async function logoutUserApi(req: express.Request, res: express.Response) {
 	console.log('logging out user.')
-	res.cookie('token', '', {
-		httpOnly: true,
-		secure: false,
-		sameSite: 'strict',
-		expires: new Date(0),
-		path: '/',
-	});
+
+	const environment = process.env.ENVIRONMENT
+	const isProd = environment && environment === 'production';
+
+	if (isProd) {
+		res.cookie("token", '', {
+			httpOnly: true,
+			secure: true,
+			sameSite: 'none',
+			expires: new Date(0),
+			path: '/',
+		});
+	} else {
+		res.cookie("token", '', {
+			httpOnly: true,
+			secure: false,
+			sameSite: 'strict',
+			expires: new Date(0),
+			path: '/',
+		});
+	}
 	respondWithJSON(res, 200, {});
 }
 

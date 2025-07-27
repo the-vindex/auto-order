@@ -9,24 +9,24 @@ import fs from 'fs';
 let _jwtSecret: string | undefined;
 
 export function initAuth() {
-    if (process.env.JWT_SECRET) {
-        _jwtSecret = process.env.JWT_SECRET;
-    } else {
-        try {
-            // Docker secrets are mounted at /run/secrets/<secret_name>
-            _jwtSecret = fs.readFileSync('/run/secrets/jwt_secret', 'utf8').trim();
-        } catch (error) {
-            console.error("JWT_SECRET is not set in environment variables or as a Docker secret.");
-            process.exit(1);
-        }
-    }
+	if (process.env.JWT_SECRET) {
+		_jwtSecret = process.env.JWT_SECRET;
+	} else {
+		try {
+			// Docker secrets are mounted at /run/secrets/<secret_name>
+			_jwtSecret = fs.readFileSync('/run/secrets/jwt_secret', 'utf8').trim();
+		} catch (error) {
+			console.error("JWT_SECRET is not set in environment variables or as a Docker secret.");
+			process.exit(1);
+		}
+	}
 }
 
 export function getJwtSecret(): string {
-    if (!_jwtSecret) {
-        throw new Error("JWT secret not initialized. Call initAuth() first.");
-    }
-    return _jwtSecret;
+	if (!_jwtSecret) {
+		throw new Error("JWT secret not initialized. Call initAuth() first.");
+	}
+	return _jwtSecret;
 }
 
 const TOKEN_ISSUER = 'auto_order';
@@ -81,20 +81,32 @@ export function validateJWT(tokenString: string, secret: string) {
 
 export function setAuthCookie(res: express.Response, userId: string) {
 	const token = makeJWT(userId, 3600 * 24, getJwtSecret());
+	const environment = process.env.ENVIRONMENT
+	const isProd = environment && environment === 'production';
 
-	res.cookie("token", token, {
-		httpOnly: true,
-		secure: false,
-		sameSite: "strict",
-		maxAge: 1000 * 60 * 60 * 24,
-		path: '/',
-	});
+	if (isProd) {
+		res.cookie("token", token, {
+			httpOnly: true,
+			secure: true,
+			sameSite: 'none',
+			maxAge: 1000 * 60 * 60 * 24,
+			path: '/',
+		});
+	} else {
+		res.cookie("token", token, {
+			httpOnly: true,
+			secure: false,
+			sameSite: 'strict',
+			maxAge: 1000 * 60 * 60 * 24,
+			path: '/',
+		});
+	}
 }
 
 export function getUserIdFrom(req: express.Request) {
 	const token = req.cookies.token;
 	const userId = validateJWT(token, getJwtSecret())
-    return userId;
+	return userId;
 }
 
 declare global {
