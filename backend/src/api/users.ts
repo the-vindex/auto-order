@@ -16,7 +16,7 @@ export async function createUserApi(req: express.Request, res: express.Response)
 		const newUser = await createUser(name, email, password);
 
 		setAuthCookie(res, newUser.userId);
-		respondWithJSON(res, 201, { userId: newUser.userId });
+		respondWithJSON(res, 201, { name: newUser.name, email: newUser.email });
 	} catch (error: any) {
 		if (error?.cause?.code === '23505') {
 			throw new UserAlreadyExistsError('Email is already in use.');
@@ -54,8 +54,9 @@ export async function loginUserApi(req: express.Request, res: express.Response) 
 			throw new UserNotAuthenticatedError('Incorrect password.')
 		}
 
+
 		setAuthCookie(res, user.userId);
-		respondWithJSON(res, 200, {})
+		respondWithJSON(res, 200, { name: user.name, email: user.email })
 
 	} catch (error) {
 		console.error('Error logging in user:', error);
