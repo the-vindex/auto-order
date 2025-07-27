@@ -1,92 +1,95 @@
 export async function createUser(name, email, password) {
-	const res = await fetch('http://localhost:3000/api/v1/users', {
-		method: 'POST',
-		credentials: 'include',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({ name, email, password }),
-	})
+  const res = await fetch('http://localhost:3000/api/v1/users', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, email, password }),
+  })
 
-	if (!res.ok) {
-		const body = await res.json()
-		const errorMessage =
-			'error' in body ? body['error'] : 'An internal server error has occurred.'
+  const responseBody = await res.json()
 
-		const error = new Error(errorMessage)
-		error.response = res
-		error.status = res.status
-		throw error
-	}
+  if (!res.ok) {
+    const errorMessage =
+      'error' in responseBody
+        ? responseBody['error']
+        : 'An internal server error has occurred.'
 
-	const date = new Date();
-	date.setTime(date.getTime() + (24 * 60 * 60 * 1000)); // 24 hours in ms
-	const expires = "expires=" + date.toUTCString();
+    const error = new Error(errorMessage)
+    error.response = res
+    error.status = res.status
+    throw error
+  }
 
-	document.cookie = `username=${body.name}; ${expires}; path=/`;
-	document.cookie = `email=${body.email}; ${expires}; path=/`;
+  const date = new Date()
+  date.setTime(date.getTime() + 24 * 60 * 60 * 1000) // 24 hours in ms
+  const expires = 'expires=' + date.toUTCString()
 
-	return res.json()
+  document.cookie = `username=${responseBody.name}; ${expires}; path=/`
+  document.cookie = `email=${responseBody.email}; ${expires}; path=/`
+
+  return responseBody
 }
 
 export async function loginUser(email, password) {
-	const res = await fetch('http://localhost:3000/api/v1/login', {
-		method: 'POST',
-		credentials: 'include',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({ email, password }),
-	})
-	const body = await res.json()
+  const res = await fetch('http://localhost:3000/api/v1/login', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  })
+  const body = await res.json()
 
-	if (!res.ok) {
-		const errorMessage =
-			'error' in body ? body['error'] : 'An internal server error has occurred.'
+  if (!res.ok) {
+    const errorMessage =
+      'error' in body ? body['error'] : 'An internal server error has occurred.'
 
-		const error = new Error(errorMessage)
-		error.response = res
-		error.status = res.status
-		throw error
-	}
+    const error = new Error(errorMessage)
+    error.response = res
+    error.status = res.status
+    throw error
+  }
 
-	const date = new Date();
-	date.setTime(date.getTime() + (24 * 60 * 60 * 1000)); // 24 hours in ms
-	const expires = "expires=" + date.toUTCString();
+  const date = new Date()
+  date.setTime(date.getTime() + 24 * 60 * 60 * 1000) // 24 hours in ms
+  const expires = 'expires=' + date.toUTCString()
 
-	document.cookie = `username=${body.name}; ${expires}; path=/`;
-	document.cookie = `email=${body.email}; ${expires}; path=/`;
+  document.cookie = `username=${body.name}; ${expires}; path=/`
+  document.cookie = `email=${body.email}; ${expires}; path=/`
 
-	return body
+  return body
 }
 
 export async function logoutUser() {
-	const res = await fetch('http://localhost:3000/api/v1/logout', {
-		method: 'POST',
-		credentials: 'include',
-		headers: {
-			'Content-Type': 'application/json', // Add this
-		},
-	})
+  await fetch('http://localhost:3000/api/v1/logout', {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
 
-	//expire cookies
-	document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-	document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  //expire cookies
+  document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+  document.cookie = 'email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
 }
 
 export async function validateCookie() {
-	try {
-		const res = await fetch('http://localhost:3000/api/v1/me', {
-			method: 'GET',
-			credentials: 'include',
-		})
+  try {
+    const res = await fetch('http://localhost:3000/api/v1/me', {
+      method: 'GET',
+      credentials: 'include',
+    })
 
-		if (res.ok) {
-			return true
-		} else {
-			return false
-		}
-	} catch (error) {
-		return false
-	}
+    if (res.ok) {
+      return true
+    } else {
+      return false
+    }
+  } catch {
+    return false
+  }
 }
