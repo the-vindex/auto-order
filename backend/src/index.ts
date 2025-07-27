@@ -1,5 +1,6 @@
 import app from './server';
 import dotenv from 'dotenv';
+import './jobs/sendreminders'
 
 dotenv.config();
 
