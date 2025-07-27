@@ -276,3 +276,36 @@ export async function markReminderAsTriggered(reminderId: string): Promise<void>
 		console.debug(`Reminder ${reminderId} successfully marked as triggered.`);
 	});
 }
+
+
+export async function getActivePriceDropReminders(): Promise<Products.ProductReminder[]> {
+	const result = await db
+		.select({
+			productId: products.productId,
+			reminderId: productReminders.reminderId,
+			userId: products.userId,
+			name: products.name,
+			status: productReminders.status,
+			triggeredAt: productReminders.triggeredAt,
+			reminderDetails: productReminders.reminderDetails,
+			urls: products.urls
+		})
+		.from(productReminders)
+		.innerJoin(products, eq(productReminders.productId, products.productId))
+		.where(and(
+			eq(productReminders.status, 'active'),
+			isNull(productReminders.triggeredAt),
+			eq(productReminders.reminderType, 'priceDrop')
+		));
+
+	return result.map(row => ({
+		productId: row.productId,
+		reminderId: row.reminderId,
+		userId: row.userId,
+		name: row.name,
+		status: row.status,
+		triggeredAt: row.triggeredAt,
+		reminderDetails: row.reminderDetails as Products.PriceDropReminder,
+		urls: row.urls ?? [],
+	}));
+}

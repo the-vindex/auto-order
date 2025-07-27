@@ -5,6 +5,8 @@ export async function sendReminderEmail(email: string, urls: string[]) {
 
 	const linksHtml = urls.map(url => `<li><a href="${url}" target="_blank">${url}</a></li>`).join("");
 
+	console.log(`Sending email to ${email}`)
+
 	const html = `
 		<h2>Your Reminder Has Been Triggered</h2>
 		<p>Here are the product links you asked to be reminded about:</p>

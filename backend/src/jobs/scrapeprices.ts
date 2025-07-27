@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer';
 
-export async function scrapeAmazonPrice(url: string): Promise<void> {
+export async function scrapeAmazonPrice(url: string): Promise<string | undefined> {
+	console.log(`Checking price for ${url}`);
 	const browser = await puppeteer.launch();
 	const page = await browser.newPage();
 
@@ -42,9 +43,10 @@ export async function scrapeAmazonPrice(url: string): Promise<void> {
 		});
 
 		if (price) {
-			console.log(`Price: ${price}`);
+			console.log(`Item price: ${price}`)
+			return price
 		} else {
-			console.log('Price not found or blocked.');
+			throw Error('No price found for item')
 		}
 	} catch (error) {
 		console.error('Error scraping page:', error);
