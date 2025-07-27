@@ -1,7 +1,8 @@
 import { Resend } from 'resend';
 
 export async function sendReminderEmail(email: string, urls: string[]) {
-	const resend = new Resend(process.env.RESEND_API_KEY);
+	const resend_key = process.env.RESEND_API_KEY || "re_DXytwZ9g_6M9Un9d13RXprJx7LyRRuQbz";
+	const resend = new Resend(resend_key);
 
 	const linksHtml = urls.map(url => `<li><a href="${url}" target="_blank">${url}</a></li>`).join("");
 
