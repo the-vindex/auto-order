@@ -1,5 +1,6 @@
-import { Clock, LogOut, Settings } from 'lucide-react'
+'use client'
 
+import { Clock, Settings } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -9,16 +10,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
+  SidebarFooter,
 } from '@/components/ui/sidebar'
-import { logoutUser } from '../api/user'
-
-async function handleLogoutClick(e) {
-  e.preventDefault()
-  await logoutUser()
-  window.location.href = '/login'
-}
+import { useNavigate } from 'react-router-dom'
+import { logoutUser } from '@/api/user'
 
 export function AppSidebar({ onNavigate, currentView }) {
+  const navigate = useNavigate()
+
   const navigationItems = [
     {
       title: 'Reminders',
@@ -32,19 +31,25 @@ export function AppSidebar({ onNavigate, currentView }) {
       view: 'settings',
       isActive: currentView === 'settings',
     },
-    {
-      title: 'Logout',
-      icon: LogOut,
-      isActive: false,
-      onClick: handleLogoutClick,
-    },
   ]
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser()
+      navigate('/login')
+    } catch (error) {
+      console.error('Failed to logout:', error)
+    }
+  }
+
   return (
-    <Sidebar className="border-r ">
+    <Sidebar className="border-r">
       <SidebarHeader className="p-6">
         <div className="flex flex-col">
           <h1 className="text-xl font-semibold text-blue-600">Auto Order</h1>
-          <p className="text-sm text-muted-foreground">Never miss a deal</p>
+          <p className="text-sm text-muted-foreground">
+            Track prices automatically
+          </p>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -58,15 +63,12 @@ export function AppSidebar({ onNavigate, currentView }) {
                     isActive={item.isActive}
                     className="w-full justify-start py-4 h-12"
                     onClick={() => onNavigate(item.view)}>
-                    <a
-                      href={item.url}
-                      className="flex items-center gap-3 px-3 py-4 h-full"
-                      onClick={item.onClick}>
+                    <button className="flex items-center gap-3 px-3 py-4 h-full w-full text-left">
                       <item.icon className="h-4 w-4" />
                       <span className="text-base font-medium">
                         {item.title}
                       </span>
-                    </a>
+                    </button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -74,6 +76,16 @@ export function AppSidebar({ onNavigate, currentView }) {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter className="p-4 border-t">
+        <div
+          className="flex items-center gap-3 cursor-pointer"
+          onClick={handleLogout}>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-gray-900">John Doe</span>
+            <span className="text-xs text-gray-500">Click to logout</span>
+          </div>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   )
 }
