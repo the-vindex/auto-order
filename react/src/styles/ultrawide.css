@@ -1,0 +1,24 @@
+/* Default styles for regular screens */
+.ultrawide-container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* MacBook-like width for screens wider than 1440px */
+@media (min-width: 1441px) {
+  .ultrawide-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+}
+
+/* Extra padding for ultrawide monitors (typically 2560px or wider) */
+@media (min-width: 2560px) {
+  .ultrawide-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 3rem;
+  }
+}
