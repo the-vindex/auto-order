@@ -19,6 +19,13 @@ export async function createUser(name, email, password) {
 		throw error
 	}
 
+	const date = new Date();
+	date.setTime(date.getTime() + (24 * 60 * 60 * 1000)); // 24 hours in ms
+	const expires = "expires=" + date.toUTCString();
+
+	document.cookie = `username=${body.name}; ${expires}; path=/`;
+	document.cookie = `email=${body.email}; ${expires}; path=/`;
+
 	return res.json()
 }
 
