@@ -24,7 +24,7 @@ To run the application in a production-like Dockerized environment:
     ```bash
     echo JWT_TOKEN=your_secret_key > jwt.secret
     ```
-4Start the services using the production Docker Compose file. This will build images, set up the database, run migrations, and start the backend server.
+4.  Start the services using the production Docker Compose file. This will build images, set up the database, run migrations, and start the backend server.
     ```bash
     docker-compose -f docker-compose.prod.yml up --build -d
     ```
