@@ -1,3 +1,5 @@
+jwt.secret
+
 # Logs
 logs
 *.log

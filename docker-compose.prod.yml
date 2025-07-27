@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/auto_order?schema=public
+    secrets:
+      - jwt_secret
+    command: npm run start
+    networks:
+      - prod_network
+
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auto_order
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auto_order -t 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - prod_network
+
+volumes:
+  postgres_data:
+
+secrets:
+  jwt_secret:
+    file: ./jwt.secret
+
+networks:
+  prod_network:
+    driver: bridge
