@@ -22,7 +22,7 @@ export function configureApp(app: express.Express) {
 	app.use(express.json());
 	app.use(requestLogger);
 	app.use(cookieParser());
-	app.use(cors({ origin: "http://localhost:5173", credentials: true }));
+	app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173", credentials: true }));
 
 	app.get('/', ping);
 
