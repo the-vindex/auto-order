@@ -5,12 +5,12 @@ import { sendReminderEmail } from '../notifier/notifier';
 import { scrapeAmazonPrice } from './scrapeprices';
 
 console.log('task being scheduled...')
-cron.schedule('* * * * *', () => {
+cron.schedule('*/15 * * * * *', () => {
 	console.log('Starting notification batch.');
-	checkProductsForDueDateNotification();
 	checkProductsForPriceNotificiation();
 });
 
+/*
 export async function checkProductsForDueDateNotification() {
 	try {
 		const dueReminders = await getDueTargetDateReminders()
@@ -27,7 +27,7 @@ export async function checkProductsForDueDateNotification() {
 		console.error(`Error checking products for notification:`, error)
 		throw error
 	}
-}
+} */
 
 export async function checkProductsForPriceNotificiation() {
 	try {
@@ -52,9 +52,12 @@ async function singleReminderPriceCheck(reminder: any) {
 			}
 			const clean = priceStr.replace(/[^0-9.]/g, '');
 			const price = parseFloat(clean);
-			if (price <= reminder.reminderDetails.targetPrice.amount) {
+			const targetPrice = reminder.reminderDetails.targetPrice.amount;
+			console.log(`Reminder Details: ${JSON.stringify(reminder.reminderDetails)}`)
+			console.log(`Target Price: ${targetPrice}`)
+			if (price <= targetPrice) {
 				const user = await getUserById(reminder.userId);
-				await sendReminderEmail(user.email, reminder.urls)
+				await sendReminderEmail(user.email, reminder.urls[0], targetPrice, price)
 				await markReminderAsTriggered(reminder.reminderId)
 			}
 		}

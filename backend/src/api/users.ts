@@ -96,6 +96,5 @@ export async function logoutUserApi(req: express.Request, res: express.Response)
 export async function validateLoginApi(req: express.Request, res: express.Response) {
 	const userId = req.headers['user-id'];
 	if (!userId) throw new UserNotAuthenticatedError('User is not logged in.');
-	scrapeAmazonPrice('https://www.amazon.com/Apple-Cancellation-Transparency-Personalized-High-Fidelity/dp/B0D1XD1ZV3')
 	respondWithJSON(res, 200, {});
 }
