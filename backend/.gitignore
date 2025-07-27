@@ -40,3 +40,6 @@ temp/
 # Debug
 .debug/
 
+
+fakeAuthExpress.js
+test_data_factories.js
