@@ -3,6 +3,31 @@ import jwt from 'jsonwebtoken';
 import type { JwtPayload } from 'jsonwebtoken';
 import { UserNotAuthenticatedError } from '../api/errors';
 import express from "express";
+import fs from 'fs';
+
+// Read JWT secret from Docker secret file or environment variable
+let _jwtSecret: string | undefined;
+
+export function initAuth() {
+    if (process.env.JWT_SECRET) {
+        _jwtSecret = process.env.JWT_SECRET;
+    } else {
+        try {
+            // Docker secrets are mounted at /run/secrets/<secret_name>
+            _jwtSecret = fs.readFileSync('/run/secrets/jwt_secret', 'utf8').trim();
+        } catch (error) {
+            console.error("JWT_SECRET is not set in environment variables or as a Docker secret.");
+            process.exit(1);
+        }
+    }
+}
+
+export function getJwtSecret(): string {
+    if (!_jwtSecret) {
+        throw new Error("JWT secret not initialized. Call initAuth() first.");
+    }
+    return _jwtSecret;
+}
 
 const TOKEN_ISSUER = 'auto_order';
 const SALT_ROUNDS = 10;
@@ -55,13 +80,9 @@ export function validateJWT(tokenString: string, secret: string) {
 }
 
 export function setAuthCookie(res: express.Response, userId: string) {
-	const jwtSecret = process.env.JWT_SECRET;
-	if (!jwtSecret) {
-		throw new Error("JWT_SECRET is not defined in environment variables.");
-	}
-	const jwt = makeJWT(userId, 3600 * 24, jwtSecret);
+	const token = makeJWT(userId, 3600 * 24, getJwtSecret());
 
-	res.cookie("token", jwt, {
+	res.cookie("token", token, {
 		httpOnly: true,
 		secure: false,
 		sameSite: "strict",
@@ -72,11 +93,8 @@ export function setAuthCookie(res: express.Response, userId: string) {
 
 export function getUserIdFrom(req: express.Request) {
 	const token = req.cookies.token;
-	const jwtSecret = process.env.JWT_SECRET;
-	if (!jwtSecret) {
-		throw new Error("JWT_SECRET is not defined in environment variables.");
-	}
-	const userId = validateJWT(token, jwtSecret)
+	const userId = validateJWT(token, getJwtSecret())
+    return userId;
 }
 
 declare global {
