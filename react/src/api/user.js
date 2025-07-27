@@ -1,12 +1,12 @@
 export async function createUser(name, email, password) {
-  const res = await fetch('http://localhost:3000/api/v1/users', {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ name, email, password }),
-  })
+	const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/users`, {
+		method: 'POST',
+		credentials: 'include',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ name, email, password }),
+	})
 
   const responseBody = await res.json()
 
@@ -33,15 +33,15 @@ export async function createUser(name, email, password) {
 }
 
 export async function loginUser(email, password) {
-  const res = await fetch('http://localhost:3000/api/v1/login', {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ email, password }),
-  })
-  const body = await res.json()
+	const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/login`, {
+		method: 'POST',
+		credentials: 'include',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ email, password }),
+	})
+	const body = await res.json()
 
   if (!res.ok) {
     const errorMessage =
@@ -64,13 +64,13 @@ export async function loginUser(email, password) {
 }
 
 export async function logoutUser() {
-  await fetch('http://localhost:3000/api/v1/logout', {
-    method: 'POST',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
+	await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/logout`, {
+		method: 'POST',
+		credentials: 'include',
+		headers: {
+			'Content-Type': 'application/json', // Add this
+		},
+	})
 
   //expire cookies
   document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
@@ -78,11 +78,11 @@ export async function logoutUser() {
 }
 
 export async function validateCookie() {
-  try {
-    const res = await fetch('http://localhost:3000/api/v1/me', {
-      method: 'GET',
-      credentials: 'include',
-    })
+	try {
+		const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/me`, {
+			method: 'GET',
+			credentials: 'include',
+		})
 
     if (res.ok) {
       return true

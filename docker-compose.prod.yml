@@ -1,4 +1,6 @@
 version: '3.8'
+
+
 services:
   backend:
     build:
@@ -9,11 +11,27 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    env_file:
+      - production.env
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/auto_order?schema=public
     secrets:
       - jwt_secret
     command: npm run start
+    networks:
+      - prod_network
+
+  frontend:
+    build:
+      context: ./react
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_started
     networks:
       - prod_network
 
