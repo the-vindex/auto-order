@@ -6,6 +6,7 @@ import { createProductReminder, getProductReminders } from './api/product'
 import { SettingsPage } from './SettingsPage'
 import { ReminderHeader } from './ReminderHeader'
 import { RemindersList } from './RemindersList'
+import './styles/ultrawide.css' // We'll create this file next
 
 const Home = () => {
   const queryClient = useQueryClient()
@@ -41,10 +42,12 @@ const Home = () => {
         <div className="flex h-screen w-full">
           <AppSidebar onNavigate={setCurrentView} currentView={currentView} />
           <SidebarInset className="flex-1">
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading reminders...</p>
+            <div className="ultrawide-container">
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading reminders...</p>
+                </div>
               </div>
             </div>
           </SidebarInset>
@@ -60,23 +63,24 @@ const Home = () => {
       <SidebarProvider>
         <div className="flex h-screen w-full">
           <AppSidebar onNavigate={setCurrentView} currentView={currentView} />
-
           <SidebarInset className="flex-1">
-            {currentView === 'reminders' ? (
-              <div className="flex flex-col h-full">
-                <ReminderHeader
-                  count={remindersData.length}
-                  showError={showErrorIndicator}
-                  onAddReminder={createReminderMutation.mutate}
-                  isLoading={createReminderMutation.isLoading}
-                  isError={createReminderMutation.isError}
-                  error={createReminderMutation.error}
-                />
-                <RemindersList reminders={remindersData} />
-              </div>
-            ) : (
-              <SettingsPage />
-            )}
+            <div className="ultrawide-container">
+              {currentView === 'reminders' ? (
+                <div className="flex flex-col h-full">
+                  <ReminderHeader
+                    count={remindersData.length}
+                    showError={showErrorIndicator}
+                    onAddReminder={createReminderMutation.mutate}
+                    isLoading={createReminderMutation.isLoading}
+                    isError={createReminderMutation.isError}
+                    error={createReminderMutation.error}
+                  />
+                  <RemindersList reminders={remindersData} />
+                </div>
+              ) : (
+                <SettingsPage />
+              )}
+            </div>
           </SidebarInset>
         </div>
       </SidebarProvider>
