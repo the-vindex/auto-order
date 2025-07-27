@@ -4,6 +4,7 @@ import { ProductReminderDto } from "../../src/api/dto/product_reminder.dto";
 import express from 'express';
 // @ts-ignore
 import { createAndLoginUser, createTestExpressInstance } from '../utils/auth_tools';
+import {initAuth} from "../../src/auth/auth";
 
 
 function generateProductReminderData() {
@@ -32,6 +33,7 @@ describe('Product tracking API Integration Tests', () => {
 	beforeAll(async () => {
 		// You might want to clear the database or seed it before running tests
 		// For now, we'll just ensure the app is ready.
+		initAuth();
 		app = createTestExpressInstance();
 	});
 

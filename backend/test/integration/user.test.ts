@@ -5,12 +5,14 @@ import { generateTestUserObject } from "../utils/test_data_factories";
 import express from "express";
 // @ts-ignore
 import { createTestExpressInstance } from "../utils/auth_tools";
+import {initAuth} from "../../src/auth/auth";
 
 describe('User API Integration Tests', () => {
 	let app: express.Express;
 	beforeAll(async () => {
 		// You might want to clear the database or seed it before running tests
 		// For now, we'll just ensure the app is ready.
+		initAuth();
 		app = createTestExpressInstance();
 	});
 
