@@ -291,23 +291,29 @@ All endpoints are prefixed with `/v1` and require a Bearer JWT obtained via the
 | -------- | --------------------- | ----------------------------- | ---------------- | ---------------------------------------- |
 | **GET**  | `/merchants`          | List supported merchants      | —                | array                                    |
 | **GET**  | `/merchants/support`  | Check if URL is supported     | `?url=https://…` | `{ supported, merchant_id }`             |
-| **POST** | `/trackings/validate` | Scrape URL once & return meta | `{ url }`        | `{ supported, merchant, current_price }` |
+| **POST** | `/product-reminders/validate` | Scrape URL once & return meta | `{ url }`        | `{ supported, merchant, current_price }` |
 
-### 15.4 Product Tracking (combined item + reminder)
+### 15.4 Product Reminders (combined item + reminder)
 
-| Method     | Path              | Purpose                                  |
-| ---------- | ----------------- | ---------------------------------------- |
-| **GET**    | `/trackings`      | List user’s trackings, filter `?status=` |
-| **POST**   | `/trackings`      | Create new tracking & reminder           |
-| **GET**    | `/trackings/{id}` | Detail incl. price sparkline             |
-| **PATCH**  | `/trackings/{id}` | Update target price / date / status      |
-| **DELETE** | `/trackings/{id}` | Cancel tracking                          |
+| Method     | Path                        | Purpose                                          |
+|------------|-----------------------------|--------------------------------------------------|
+| **GET**    | `/product-reminders`        | List user’s product-reminders, filter `?status=` |
+| **POST**   | `/product-reminders`        | Create new product & reminder                    |
+| **PUT**    | `/product-reminders/{id}`   | Update product reminder                          |
+| **DELETE** | `/product-reminders/{id}`   | Cancel reminder                                  |
+
+Postponed until when needed:
+
+| Method     | Path                        | Purpose                                          |
+|------------|-----------------------------|--------------------------------------------------|
+| **GET**    | `/product-reminders/{id}`   | Detail incl. price sparkline                     |
+| **PATCH**  | `/product-reminders/{id}`   | Update target price / date / status              |
 
 ### 15.5 Price Samples (history)
 
 | Method  | Path                     | Purpose                            |
 | ------- | ------------------------ | ---------------------------------- |
-| **GET** | `/trackings/{id}/prices` | Latest N price points (default 30) |
+| **GET** | `/product-reminders/{id}/prices` | Latest N price points (default 30) |
 
 ### 15.6 Notifications
 
@@ -334,8 +340,8 @@ All endpoints are prefixed with `/v1` and require a Bearer JWT obtained via the
 
 #### Flow A – Add Time‑Based Reminder
 
-1. **Paste URL** `POST /trackings/validate` → `{ supported:true, current_price:49.99 }`.
-2. **Create** `POST /trackings`
+1. **Paste URL** `POST /product-reminders/validate` → `{ supported:true, current_price:49.99 }`.
+2. **Create** `POST /product-reminders`
    ````
    {
      "url": "https://…",
@@ -345,25 +351,25 @@ All endpoints are prefixed with `/v1` and require a Bearer JWT obtained via the
    }
    ``` → `201 { id, status:"active" }`.
    ````
-3. UI navigates back, shows new card from `GET /trackings`.
+3. UI navigates back, shows new card from `GET /product-reminders`.
 
 #### Flow B – Price‑Drop Reminder
 
 1. Validate URL as above.
-2. `POST /trackings` with `rule_type:"target_price", target_price:44.99`.
+2. `POST /product-reminders` with `rule_type:"target_price", target_price:44.99`.
 
 #### Flow C – Dashboard Load
 
-- On app start: parallel `GET /trackings?status=active` and `GET /users/me`.
+- On app start: parallel `GET /product-reminders?status=active` and `GET /users/me`.
 - Uses results to render cards & prefs.
 
 #### Flow D – Edit Reminder
 
-- `PATCH /trackings/{id}` with updated fields (e.g., new target\_price).
+- `PATCH /product-reminders/{id}` with updated fields (e.g., new target\_price).
 
 #### Flow E – Delete Reminder
 
-- `DELETE /trackings/{id}` → 204.
+- `DELETE /product-reminders/{id}` → 204.
 
 #### Flow F – Settings Change
 
@@ -371,7 +377,7 @@ All endpoints are prefixed with `/v1` and require a Bearer JWT obtained via the
 
 #### Flow G – Open Notification
 
-1. Push deep‑link → `/trackings/{id}` call to refresh.
+1. Push deep‑link → `/product-reminders/{id}` call to refresh.
 2. Optional: `PATCH /notifications/{notif_id}` `{ "read": true }`.
 
 ---
