@@ -1,5 +1,5 @@
 export async function createProductReminder(productReminderData) {
-  const res = await fetch('http://localhost:3000/api/v1/product-reminders', {
+  const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/product-reminders`, {
     method: 'POST',
     credentials: 'include',
     headers: {
@@ -23,7 +23,7 @@ export async function createProductReminder(productReminderData) {
 }
 
 export async function getProductReminders() {
-  const res = await fetch('http://localhost:3000/api/v1/product-reminders', {
+  const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/v1/product-reminders`, {
     method: 'GET',
     credentials: 'include',
     headers: {
@@ -50,7 +50,7 @@ export async function updateProductReminderById(
   productReminderData
 ) {
   const res = await fetch(
-    `http://localhost:3000/api/v1/product-reminders/${productId}`,
+    `${import.meta.env.VITE_API_BASE_URL}/api/v1/product-reminders/${productId}`,
     {
       method: 'PUT',
       credentials: 'include',
@@ -77,7 +77,7 @@ export async function updateProductReminderById(
 
 export async function deleteProductReminderById(productId) {
   const res = await fetch(
-    `http://localhost:3000/api/v1/product-reminders/${productId}`,
+    `${import.meta.env.VITE_API_BASE_URL}/api/v1/product-reminders/${productId}`,
     {
       method: 'DELETE',
       credentials: 'include',
