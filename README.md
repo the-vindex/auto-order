@@ -41,7 +41,7 @@ To test the application locally, follow these steps:
     sudo sysctl --system
     ```
    
-9. Open your browser at https://localhost
+9. Open your browser at https://localhost:5173 (or a custom port if you configured one)
 
 
 # Development Setup
