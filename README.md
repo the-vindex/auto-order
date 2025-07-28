@@ -10,7 +10,7 @@ Online shoppers often come across products they want but prefer to wait for a sa
 
 ### (OPTIONAL) Set Up Resend Account
 
-To receive email notifications in your account, a resend api key is needed. Go to resend.com, create an account, and get an API key. Use this api key in your .env file, as RESEND_API_KEY. Ensure the email you use when tseting this app is the same one you use to create your resend account.
+To receive email notifications in development, a resend api key is needed. Go to resend.com, create an account, and get an API key. Use this api key in your .env file, as RESEND_API_KEY. Ensure the email you use when tseting this app is the same one you use to create your resend account.
 
 ### Database Setup
 
