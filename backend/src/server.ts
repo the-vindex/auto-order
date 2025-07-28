@@ -33,7 +33,10 @@ export function configureApp(app: express.Express) {
 
 	router.post('/users', validateWithSchema("login.schema.json"), createUserApi);
 
-	router.get('/users', getAllUsersApi);
+//	router.get('/users', getAllUsersApi); // nuking this endpoint because it just leaks whole user database! Just keeping easter egg here
+	router.get('/users', (req, res) => {
+		res.status(403).json({ error: "Nice try!" });
+	});
 
 	router.post('/login', loginUserApi)
 
