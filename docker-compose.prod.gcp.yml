@@ -1,0 +1,106 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: always
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      # IMPORTANT: Change this to your email address for Let's Encrypt.
+      - "--certificatesresolvers.letsencrypt.acme.email=vindex@fastmail.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # Set Let's Encrypt to staging mode to avoid rate limits during testing.
+#      - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      # (Optional) Enable the Traefik dashboard for monitoring.
+      - "--api.dashboard=true"
+    ports:
+      - "80:80"
+      - "443:443"
+      # (Optional) Expose the dashboard on port 8080.
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "letsencrypt_data:/letsencrypt"
+    networks:
+      - prod_network
+
+  backend:
+    # REMOVED: build context
+    # ADDED: image path from Artifact Registry
+    image: europe-west3-docker.pkg.dev/balmy-chain-467222-a1/auto-order-artifactory/backend:latest
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - production.env
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/auto_order?schema=public
+    secrets:
+      - jwt_secret
+    command: npm run start
+    networks:
+      - prod_network
+    labels:
+      - "traefik.enable=true"
+      # IMPORTANT: Change your-domain.com to your actual domain.
+      - "traefik.http.routers.backend.rule=Host(`timely.tier-zero.co.uk`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      # Define a middleware to strip the /api prefix.
+#      - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
+      # Apply the middleware to the router.
+#      - "traefik.http.routers.backend.middlewares=strip-api-prefix"
+      - "traefik.http.services.backend.loadbalancer.server.port=3000"
+
+  frontend:
+    # REMOVED: build context and args
+    # ADDED: image path from Artifact Registry
+    image: europe-west3-docker.pkg.dev/balmy-chain-467222-a1/auto-order-artifactory/frontend:latest
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      - prod_network
+    labels:
+      - "traefik.enable=true"
+      # IMPORTANT: Change your-domain.com to your actual domain.
+      - "traefik.http.routers.frontend.rule=Host(`timely.tier-zero.co.uk`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+
+  db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auto_order
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auto_order -t 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - prod_network
+
+volumes:
+  postgres_data:
+  letsencrypt_data:
+
+secrets:
+  jwt_secret:
+    file: ./jwt.secret
+
+networks:
+  prod_network:
+    driver: bridge
