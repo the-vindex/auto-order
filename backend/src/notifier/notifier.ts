@@ -6,7 +6,10 @@ export async function sendReminderEmail(
 	targetPrice: number,
 	currentPrice: number
 ) {
-	const resend_key = process.env.RESEND_API_KEY || "re_DXytwZ9g_6M9Un9d13RXprJx7LyRRuQbz";
+	const resend_key = process.env.RESEND_API_KEY;
+	if (!resend_key) {
+		console.error('No API key configured for resend.')
+	}
 	const resend = new Resend(resend_key);
 
 	console.log(`Sending email to ${email}`);
@@ -21,10 +24,16 @@ export async function sendReminderEmail(
 	<p><a href="${url}" target="_blank">${url}</a></p>
 `;
 
-	await resend.emails.send({
+	const result = await resend.emails.send({
 		from: 'Auto Order <onboarding@resend.dev>',
 		to: email,
 		subject: '🎯 Price Drop Alert – Your Product is on Sale!',
 		html,
 	});
+
+	console.log(`Email Result: ${JSON.stringify(result)}`)
+
+	if (result.error) {
+		console.error(result.error)
+	}
 }
