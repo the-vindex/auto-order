@@ -3,7 +3,7 @@ import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { ReminderCard } from './ReminderCard'
 
-export function RemindersList({ reminders = [] }) {
+export function RemindersList({ isLoading, reminders = [] }) {
   const [searchQuery, setSearchQuery] = useState('')
 
   const filteredReminders = reminders.filter(reminder =>
@@ -23,10 +23,24 @@ export function RemindersList({ reminders = [] }) {
         />
       </div>
 
+      {isLoading && (
+        <div className="ultrawide-container">
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading reminders...</p>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Reminders list */}
       <div className="space-y-4">
         {filteredReminders.map(reminder => (
-          <ReminderCard key={reminder.productId} item={reminder} />
+          <ReminderCard
+            isLoading={isLoading}
+            key={reminder.productId}
+            item={reminder}
+          />
         ))}
       </div>
 

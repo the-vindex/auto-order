@@ -1,5 +1,4 @@
 import { Badge } from '@/components/ui/badge'
-import { Calendar } from 'lucide-react'
 
 export function ReminderDetails({ details }) {
   const formatPrice = price => {
@@ -34,29 +33,6 @@ export function ReminderDetails({ details }) {
               currency: initialPrice.currency,
             })}
           </span>
-        </div>
-      </div>
-    )
-  }
-
-  if (details.type === 'targetDate') {
-    const targetDate = new Date(details.targetDate)
-    const formattedDate = targetDate.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-
-    return (
-      <div className="space-y-2">
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-gray-500" />
-          <span className="text-sm text-gray-700">{formattedDate}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-xs">
-            📅 Date Reminder
-          </Badge>
         </div>
       </div>
     )

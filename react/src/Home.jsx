@@ -27,9 +27,9 @@ const Home = () => {
 
   const createReminderMutation = useMutation({
     mutationFn: createProductReminder,
-    onSuccess: data => {
+    onSuccess: async data => {
       console.log('Reminder created successfully:', data)
-      queryClient.invalidateQueries({ queryKey: ['productReminders'] })
+      await queryClient.invalidateQueries({ queryKey: ['productReminders'] })
     },
     onError: error => {
       console.error('Failed to create reminder:', error)
@@ -69,13 +69,17 @@ const Home = () => {
                 <div className="flex flex-col h-full">
                   <ReminderHeader
                     count={remindersData.length}
+                    data={remindersData}
                     showError={showErrorIndicator}
-                    onAddReminder={createReminderMutation.mutate}
-                    isLoading={createReminderMutation.isLoading}
+                    onAddReminder={createReminderMutation.mutateAsync}
+                    isLoading={createReminderMutation.isPending}
                     isError={createReminderMutation.isError}
                     error={createReminderMutation.error}
                   />
-                  <RemindersList reminders={remindersData} />
+                  <RemindersList
+                    isLoading={isLoading}
+                    reminders={remindersData}
+                  />
                 </div>
               ) : (
                 <SettingsPage />
