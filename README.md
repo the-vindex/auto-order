@@ -1,4 +1,4 @@
-# Auto-Order alias Timely Buyer (tm) - Product Reminder and Ordering App
+# Timely Buyer
 Track sales on your favorite items, all in one place!
 TODO: ADD AN IMAGE OF THE SITE HERE
 
