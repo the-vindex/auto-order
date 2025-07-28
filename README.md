@@ -11,14 +11,16 @@ Online shoppers often come across products they want but prefer to wait for a sa
 
 After a user has registered, they have the ability to create 'product reminders' in the home page. Here, one can enter a URL for the product and set a target price to receive a notification. Our service then fetches the price from the provided URL and uses that information to populate the entry in the home page. Then, on regular intervals, Timely Buyer will check the current price of the item. If the current price has dropped below the user-specified target price, a notification is sent to the user's email!
 
-## Quick Start
+## Super quick start
 
-Super quick start: https://timely.tier-zero.co.uk/
+Head over to: https://timely.tier-zero.co.uk/
 - Register with any (even fake) email
 - Note: When you add a product reminder we scrape Amazon.com for it's price. **It's not 100 % reliable, sorry for that!** In case we fail to scrape, we won't add item to the list.
 - hosted on Google Cloud Platform
 - SSL by Let's Encrypt
 
+
+## Quick Start
 
 To quickly setup the application locally, follow these steps. Alternatively, if you are looking to set the project up for development, see the *Development Steps* section.
 1. Install modern docker (or docker-compose) on your machine.
