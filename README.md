@@ -7,6 +7,10 @@ Track sales on your favorite items, all in one place!
 
 Online shoppers often come across products they want but prefer to wait for a sale before purchasing. This project was built to centralize and track those "wait-for-a-sale" items in one place. Users can register products, set a target price, and receive a notification when the item's price drops below their specified threshold — helping them buy at the right time without constantly checking for deals.
 
+## How It Works
+
+After a user has registered, they have the ability to create 'product reminders' in the home page. Here, one can enter a URL for the product and set a target price to receive a notification. Our service then fetches the price from the provided URL and uses that information to populate the entry in the home page. Then, on regular intervals, Timely Buyer will check the current price of the item. If the current price has dropped below the user-specified target price, a notification is sent to the user's email!
+
 ## Quick Start
 
 To test the application locally, follow these steps:
