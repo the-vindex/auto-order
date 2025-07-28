@@ -13,7 +13,7 @@ After a user has registered, they have the ability to create 'product reminders'
 
 ## Quick Start
 
-To test the application locally, follow these steps:
+To quickly setup the application locally, follow these steps. Alternatively, if you are looking to set the project up for development, see the *Development Steps* section.
 1. Install modern docker (or docker-compose) on your machine.
 2. Clone the repository:
     ```bash
