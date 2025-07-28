@@ -97,30 +97,3 @@ To test the application locally, follow these steps:
 *   **Frontend:** React
 *   **Database:** PostgreSQL
 *   **Containerization:** Docker
-
-
-
-# How to Start in Production
-
-To run the application in a production-like Dockerized environment:
-
-1.  Ensure Docker is installed and running.
-2.  Navigate to the project root directory:
-    ```bash
-    cd auto-order
-    ```
-3.  Create jwt.secret file with JWT_TOKEN=your_secret_key
-    ```bash
-    echo JWT_TOKEN=your_secret_key > jwt.secret
-    ```
-4.  Start the services using the production Docker Compose file. This will build images, set up the database, run migrations, and start the backend server.
-    ```bash
-    docker-compose -f docker-compose.prod.yml up --build -d
-    ```
-    The backend will be accessible on `http://localhost:3000`.
-    TODO: The frontend will be accessible on `http://localhost:5173`.
-
-5.  To stop the services, run:
-    ```bash 
-    docker-compose -f docker-compose.prod.yml down
-    ```
