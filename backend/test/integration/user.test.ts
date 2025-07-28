@@ -32,7 +32,7 @@ describe('User API Integration Tests', () => {
 		expect(res.body).toHaveProperty('email');
 	});
 
-	it('should get all users via GET /api/v1/users', async () => {
+	it('Endpoing leaking all user data should be disabled /api/v1/users', async () => {
 		// First, create a user to ensure there's data to retrieve
 		await request(app)
 			.post('/api/v1/users')
@@ -40,11 +40,12 @@ describe('User API Integration Tests', () => {
 
 		const res = await request(app).get('/api/v1/users');
 
-		expect(res.statusCode).toEqual(200);
-		expect(Array.isArray(res.body)).toBe(true);
-		expect(res.body.length).toBeGreaterThanOrEqual(1);
-		expect(res.body[0]).toHaveProperty('userId');
-		expect(res.body[0]).toHaveProperty('name');
+		expect(res.statusCode).toEqual(403);
+		expect(res.body).toEqual({ error: "Nice try!" });
+		// expect(Array.isArray(res.body)).toBe(true);
+		// expect(res.body.length).toBeGreaterThanOrEqual(1);
+		// expect(res.body[0]).toHaveProperty('userId');
+		// expect(res.body[0]).toHaveProperty('name');
 	});
 
 	it('should validate json on create user and return 400 for invalid data', async () => {
