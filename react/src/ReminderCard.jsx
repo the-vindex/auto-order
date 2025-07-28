@@ -16,7 +16,7 @@ import { ReminderCardHeader } from './ReminderCardHeader'
 import { ReminderDetails } from './ReminderDetails'
 import { ReminderEditForm } from './ReminderEditForm'
 
-export function ReminderCard({ item }) {
+export function ReminderCard({ isLoading, item }) {
   const queryClient = useQueryClient()
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
 
@@ -42,7 +42,6 @@ export function ReminderCard({ item }) {
         : '',
   }
 
-  // Update mutation
   const updateReminderMutation = useMutation({
     mutationFn: async updateData => {
       return updateProductReminderById(item.productId, updateData)
@@ -113,7 +112,10 @@ export function ReminderCard({ item }) {
 
           <div className="flex-1">
             <ReminderCardHeader name={item.name} status={item.status} />
-            <ReminderDetails details={item.reminderDetails} />
+            <ReminderDetails
+              isLoading={isLoading}
+              details={item.reminderDetails}
+            />
 
             {item.urls && item.urls.length > 0 && (
               <div className="flex items-center gap-1 text-sm text-gray-500 mt-2">
