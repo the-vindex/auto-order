@@ -132,7 +132,7 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
     <Popover open={isPopoverOpen} onOpenChange={handlePopoverChange}>
       <PopoverTrigger asChild>
         <Button className="bg-blue-600 hover:bg-blue-700">
-          <Plus className="h-4 w-4 mr-2" />
+          <Plus className="h-4 w-4" />
           Add
         </Button>
       </PopoverTrigger>
@@ -148,7 +148,7 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
 
             <div className="grid gap-4">
               {/* Name Input */}
-              <div className="grid gap-2">
+              <div className="grid gap-2 p-1">
                 <Label htmlFor="name">Product Name</Label>
                 <Input
                   id="name"
@@ -163,7 +163,7 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
               {/* URLs Input */}
               <div className="grid gap-2">
                 <Label htmlFor="urls">Amazon Product URLs</Label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 p-1">
                   <Input
                     id="urls"
                     placeholder="Enter Amazon URL and press Enter"
@@ -198,7 +198,7 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
               </div>
 
               {/* Currency */}
-              <div className="grid gap-2">
+              <div className="grid gap-2 p-1">
                 <Label htmlFor="currency">Currency</Label>
                 <select
                   id="currency"
@@ -215,7 +215,7 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
               </div>
 
               {/* Target Price */}
-              <div className="grid gap-2">
+              <div className="grid gap-2 p-1">
                 <Label htmlFor="targetPrice">Target Price ($)</Label>
                 <Input
                   id="targetPrice"

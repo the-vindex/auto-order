@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { loginUser } from './api/user'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 import {
@@ -21,6 +21,7 @@ import { Eye, EyeOff, Mail, AlertCircle } from 'lucide-react'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -51,36 +52,49 @@ export default function LoginPage() {
   }
 
   const mutation = useMutation({
-    mutationFn: async e => {
-      e.preventDefault()
+    mutationFn: async () => {
       if (!validateForm()) {
-        throw new Error('')
+        throw new Error('Validation failed')
       }
       localStorage.setItem('email', formData.email)
       return loginUser(formData.email, formData.password)
     },
     onError: error => {
-      if (error?.status === 409) {
+      console.error('Login error:', error)
+      if (error?.status === 401) {
         setErrors(prev => ({
           ...prev,
-          email: 'An account with this email already exists',
+          general: 'Invalid email or password. Please try again.',
+        }))
+      } else if (error?.status === 404) {
+        setErrors(prev => ({
+          ...prev,
+          general:
+            'Account not found. Please check your email or create an account.',
         }))
       } else if (error?.message === 'Validation failed') {
-        return
+        return // Validation errors already set
       } else {
-        console.error('Registration error:', error)
         setErrors(prev => ({
           ...prev,
-          general: error?.message || 'Registration failed. Please try again.',
+          general: error?.message || 'Login failed. Please try again.',
         }))
       }
     },
-    onSuccess: data => {
+    onSuccess: async data => {
       setErrors({})
       console.log('Login successful:', data)
+
+      await queryClient.invalidateQueries({ queryKey: ['validate'] })
+
       navigate('/')
     },
   })
+
+  const handleSubmit = e => {
+    e.preventDefault()
+    mutation.mutate()
+  }
 
   const navigateToRegister = () => {
     console.log('Navigating to register page.')
@@ -99,7 +113,7 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
 
-        <form onSubmit={mutation.mutate}>
+        <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -168,21 +182,22 @@ export default function LoginPage() {
                 </Label>
               </div>
             </div>
+
+            {errors.general && (
+              <div className="flex items-center space-x-1 text-sm text-red-500">
+                <AlertCircle className="h-4 w-4" />
+                <span>{errors.general}</span>
+              </div>
+            )}
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-4">
             <Button
               type="submit"
               className="w-full"
-              disabled={mutation.isLoading}>
-              {mutation.isLoading ? 'Signing in...' : 'Sign in'}
+              disabled={mutation.isPending}>
+              {mutation.isPending ? 'Signing in...' : 'Sign in'}
             </Button>
-
-            {mutation.isError && (
-              <div className="text-red-500 text-center text-sm">
-                {mutation.error?.message || 'Login failed'}
-              </div>
-            )}
 
             {mutation.isSuccess && (
               <div className="text-green-600 text-center text-sm">
