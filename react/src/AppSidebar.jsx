@@ -46,7 +46,7 @@ export function AppSidebar({ onNavigate, currentView }) {
   }
 
   return (
-    <Sidebar className="border-r w-56 flex-shrink-0">
+    <Sidebar className="border-r w-72 flex-shrink-0">
       <SidebarHeader className="p-4">
         <div className="flex flex-col">
           <h1 className="text-xl font-semibold text-blue-600">Auto Order</h1>
