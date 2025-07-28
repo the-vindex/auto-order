@@ -42,6 +42,23 @@ export function ReminderCard({ isLoading, item }) {
         : '',
   }
 
+  // Check if item has Amazon URLs
+  const hasAmazonUrl = item.urls?.some(
+    url =>
+      url.includes('amazon.com') ||
+      url.includes('amazon.') ||
+      url.includes('amzn.')
+  )
+
+  // Generate static asset path for Amazon images
+  const getImageSrc = () => {
+    if (hasAmazonUrl) {
+      // Use Amazon logo for Amazon products
+      return '/Amazon_logo.svg'
+    }
+    return '/placeholder.svg'
+  }
+
   const updateReminderMutation = useMutation({
     mutationFn: async updateData => {
       return updateProductReminderById(item.productId, updateData)
@@ -99,11 +116,11 @@ export function ReminderCard({ isLoading, item }) {
       <CardContent className="p-4">
         <div className="flex items-start gap-4">
           <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-            {item.image ? (
+            {hasAmazonUrl ? (
               <img
-                src={item.image || '/placeholder.svg'}
+                src={getImageSrc()}
                 alt={item.name}
-                className="w-full h-full object-cover"
+                className="w-12 h-8 object-contain"
               />
             ) : (
               <div className="w-8 h-8 bg-gray-300 rounded" />
