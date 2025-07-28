@@ -14,10 +14,10 @@ After a user has registered, they have the ability to create 'product reminders'
 ## Super quick start
 
 Head over to: https://timely.tier-zero.co.uk/
-- Register with any (even fake) email
+- Register with any (even fake) email.
 - Note: When you add a product reminder we scrape Amazon.com for it's price. **It's not 100 % reliable, sorry for that!** In case we fail to scrape, we won't add item to the list.
-- hosted on Google Cloud Platform
-- SSL by Let's Encrypt
+- Hosted on Google Cloud Platform.
+- SSL by Let's Encrypt.
 
 
 ## Quick Start
