@@ -4,8 +4,6 @@ FROM node:22 AS builder
 WORKDIR /usr/src/app
 
 # Copy application dependency manifests to the container.
-# A wildcard is used to ensure both package.json AND package-lock.json are copied.
-# Copying this first prevents re-running npm install on every code change.
 COPY package*.json ./
 
 # Install app dependencies
@@ -19,16 +17,22 @@ COPY drizzle ./drizzle
 RUN npm run build
 
 # Stage 2: Production environment
-FROM node:22-slim
+# Use the official Puppeteer image which includes all necessary dependencies.
+FROM ghcr.io/puppeteer/puppeteer:22.10.0
 
-WORKDIR /usr/src/app
+# The base image already sets the user to 'puppeteer'.
+# We'll create and use a directory within the user's home for our app.
+WORKDIR /home/puppeteer/app
 
-# Copy built application and dependencies from the builder stage
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/node_modules ./node_modules
-COPY --from=builder /usr/src/app/package.json ./package.json
-COPY --from=builder /usr/src/app/contracts ./contracts
-COPY --from=builder /usr/src/app/drizzle ./drizzle
+# Copy built application and dependencies from the builder stage,
+# ensuring the 'puppeteer' user owns the files.
+COPY --from=builder --chown=puppeteer:puppeteer /usr/src/app/dist ./dist
+COPY --from=builder --chown=puppeteer:puppeteer /usr/src/app/node_modules ./node_modules
+COPY --from=builder --chown=puppeteer:puppeteer /usr/src/app/package.json ./package.json
+COPY --from=builder --chown=puppeteer:puppeteer /usr/src/app/contracts ./contracts
+COPY --from=builder --chown=puppeteer:puppeteer /usr/src/app/drizzle ./drizzle
+
+# No need to switch users; we are already the 'puppeteer' user.
 
 # Expose port and start the application
 EXPOSE 3000

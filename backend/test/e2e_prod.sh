@@ -58,11 +58,18 @@ log "User registered successfully. User ID: $USER_ID"
 log "Creating a product reminder..."
 REMINDER_PAYLOAD=$(cat <<EOF
 {
-  "name": "Test Product Reminder",
-  "urls": ["https://example.com/product/${RANDOM_SUFFIX}"],
+  "name": "Test Price Drop Reminder",
+  "urls": ["https://www.amazon.com/Precision-Touchscreen-Control-Accurate-Temperature/dp/B0F1TQ8X1T/"],
   "reminderDetails": {
-    "type": "targetDate",
-    "targetDate": "2025-12-31"
+    "type": "priceDrop",
+    "initialPrice": {
+      "amount": 10000,
+      "currency": "USD"
+    },
+    "targetPrice": {
+      "amount": 9000,
+      "currency": "USD"
+    }
   }
 }
 EOF
@@ -89,10 +96,17 @@ UPDATED_NAME="Updated_Test_Product_Reminder"
 UPDATE_PAYLOAD=$(cat <<EOF
 {
   "name": "${UPDATED_NAME}",
-  "urls": ["https://example.com/product/updated/${RANDOM_SUFFIX}"],
+  "urls": ["https://www.amazon.com/Precision-Touchscreen-Control-Accurate-Temperature/dp/B0F1TQ8X1T/"],
   "reminderDetails": {
-    "type": "targetDate",
-    "targetDate": "2026-01-01"
+    "type": "priceDrop",
+    "initialPrice": {
+      "amount": 10000,
+      "currency": "USD"
+    },
+    "targetPrice": {
+      "amount": 8500,
+      "currency": "USD"
+    }
   }
 }
 EOF

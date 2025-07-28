@@ -4,7 +4,10 @@
 set -e
 
 # --- Configuration ---
-BASE_URL="http://localhost:3000/api/v1"
+BASE_URL="https://vindex.info/api/v1"
+
+#BASE_URL="https://timely.tier-zero.co.uk/api/v1"
+
 COOKIE_JAR="cookies.txt"
 # Clean up cookie jar on exit
 trap 'rm -f "$COOKIE_JAR"' EXIT
@@ -27,7 +30,7 @@ log "Using user email: $USER_EMAIL"
 
 # 2. Register a new user and log in (the registration API sets the auth cookie)
 log "Registering new user..."
-if ! REGISTRATION_RESPONSE=$(curl -s -X POST "${BASE_URL}/users" \
+if ! REGISTRATION_RESPONSE=$(curl -k -s -X POST "${BASE_URL}/users" \
   -H "Content-Type: application/json" \
   -c "$COOKIE_JAR" \
   -d @- <<EOF
@@ -55,17 +58,24 @@ log "User registered successfully. User ID: $USER_ID"
 log "Creating a product reminder..."
 REMINDER_PAYLOAD=$(cat <<EOF
 {
-  "name": "Test Product Reminder",
-  "urls": ["https://example.com/product/${RANDOM_SUFFIX}"],
+  "name": "Test Price Drop Reminder",
+  "urls": ["https://www.amazon.com/Precision-Touchscreen-Control-Accurate-Temperature/dp/B0F1TQ8X1T/"],
   "reminderDetails": {
-    "type": "targetDate",
-    "targetDate": "2025-12-31"
+    "type": "priceDrop",
+    "initialPrice": {
+      "amount": 10,
+      "currency": "USD"
+    },
+    "targetPrice": {
+      "amount": 2,
+      "currency": "USD"
+    }
   }
 }
 EOF
 )
 
-CREATE_RESPONSE=$(curl -s -X POST "${BASE_URL}/product-reminders" \
+CREATE_RESPONSE=$(curl -k -s -X POST "${BASE_URL}/product-reminders" \
   -H "Content-Type: application/json" \
   -b "$COOKIE_JAR" \
   -d "$REMINDER_PAYLOAD"
@@ -86,16 +96,23 @@ UPDATED_NAME="Updated_Test_Product_Reminder"
 UPDATE_PAYLOAD=$(cat <<EOF
 {
   "name": "${UPDATED_NAME}",
-  "urls": ["https://example.com/product/updated/${RANDOM_SUFFIX}"],
+  "urls": ["https://www.amazon.com/Precision-Touchscreen-Control-Accurate-Temperature/dp/B0F1TQ8X1T/"],
   "reminderDetails": {
-    "type": "targetDate",
-    "targetDate": "2026-01-01"
+    "type": "priceDrop",
+    "initialPrice": {
+      "amount": 10000,
+      "currency": "USD"
+    },
+    "targetPrice": {
+      "amount": 8500,
+      "currency": "USD"
+    }
   }
 }
 EOF
 )
 
-UPDATE_RESPONSE=$(curl -s -X PUT "${BASE_URL}/product-reminders/${PRODUCT_ID}" \
+UPDATE_RESPONSE=$(curl -k -s -X PUT "${BASE_URL}/product-reminders/${PRODUCT_ID}" \
   -H "Content-Type: application/json" \
   -b "$COOKIE_JAR" \
   -d "$UPDATE_PAYLOAD"
@@ -111,7 +128,7 @@ fi
 
 # 6. Read all product reminders for the user again to verify the update
 log "Reading all product reminders after update..."
-READ_REMINDERS_RESPONSE_AFTER_UPDATE=$(curl -s -X GET "${BASE_URL}/product-reminders" \
+READ_REMINDERS_RESPONSE_AFTER_UPDATE=$(curl -k -s -X GET "${BASE_URL}/product-reminders" \
   -b "$COOKIE_JAR" \
   -H "Accept: application/json"
 )
@@ -130,7 +147,7 @@ log "E2E test completed successfully!"
 
 # 7. Delete the product reminder
 log "Deleting the product reminder..."
-DELETE_RESPONSE=$(curl -s -X DELETE "${BASE_URL}/product-reminders/${PRODUCT_ID}" \
+DELETE_RESPONSE=$(curl -k -s -X DELETE "${BASE_URL}/product-reminders/${PRODUCT_ID}" \
   -b "$COOKIE_JAR"
 )
 
@@ -144,7 +161,7 @@ fi
 
 # 8. Read all product reminders for the user after deletion to verify no products are left
 log "Reading all product reminders after deletion..."
-READ_REMINDERS_RESPONSE_AFTER_DELETE=$(curl -s -X GET "${BASE_URL}/product-reminders" \
+READ_REMINDERS_RESPONSE_AFTER_DELETE=$(curl -k -s -X GET "${BASE_URL}/product-reminders" \
   -b "$COOKIE_JAR" \
   -H "Accept: application/json"
 )

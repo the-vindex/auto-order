@@ -8,6 +8,23 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+# Default environment file
+ENV_FILE="production.env"
+PUSH=true
+
+# Read script parameters:
+# --test or --prod determines env file we will use
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        --test) ENV_FILE="test.env"; PUSH=fasle; shift ;;
+        --prod) ENV_FILE="production.env"; PUSH=true; shift ;;
+        --help) echo "Usage: $0 [--test | --prod] [--no-push]"; exit 0 ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+done
+
+
+
 GCP_PROJECT_ID="balmy-chain-467222-a1"
 GCP_REGION="europe-west3" # Change this if your repository is in a different region.
 IMAGE_REPO_NAME="auto-order-artifactory"
@@ -45,12 +62,15 @@ docker build \
 echo "Building backend image..."
 docker build -t $BACKEND_IMAGE ./backend
 
-# --- Push Images ---
-echo "Pushing frontend image to Artifact Registry..."
-docker push $FRONTEND_IMAGE
+#check if we should push images
 
-echo "Pushing backend image to Artifact Registry..."
-docker push $BACKEND_IMAGE
+if [ "$PUSH" = true ]; then
+    echo "Pushing images to Artifact Registry..."
+    docker push $FRONTEND_IMAGE
+    docker push $BACKEND_IMAGE
+else
+    echo "Skipping image push."
+fi
 
 echo "---"
 echo "✅ Build and push complete!"

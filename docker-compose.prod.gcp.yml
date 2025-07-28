@@ -49,8 +49,8 @@ services:
       - prod_network
     labels:
       - "traefik.enable=true"
-      # IMPORTANT: Change your-domain.com to your actual domain.
-      - "traefik.http.routers.backend.rule=Host(`timely.tier-zero.co.uk`) && PathPrefix(`/api`)"
+      # Use the domain from the .env file for the routing rule.
+      - "traefik.http.routers.backend.rule=Host(`${DOMAIN_NAME}`) && PathPrefix(`/api`)"
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
       # Define a middleware to strip the /api prefix.
@@ -70,8 +70,8 @@ services:
       - prod_network
     labels:
       - "traefik.enable=true"
-      # IMPORTANT: Change your-domain.com to your actual domain.
-      - "traefik.http.routers.frontend.rule=Host(`timely.tier-zero.co.uk`)"
+      # Use the domain from the .env file for the routing rule.
+      - "traefik.http.routers.frontend.rule=Host(`${DOMAIN_NAME}`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
