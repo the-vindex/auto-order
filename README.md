@@ -23,10 +23,14 @@ To test the application locally, follow these steps:
     ```bash
     cp test.env.example test.env
     ```
-5. (OPTIONAL) Set Up Resend Account
+5. Set up JWT Secret, used for creating JWTs:
+6. ```bash
+    echo JWT_TOKEN=your_secret_key > jwt.secret
+    ```
+7. (OPTIONAL) Set Up Resend Account
    To receive email notifications in development, a resend api key is needed. Go to resend.com, create an account, and get an API key. Use this api key in your .env file, as RESEND_API_KEY. Ensure the email you use when tseting this app is the same one you use to create your resend account.
 
-6. Start the application using script below.
+8. Start the application using script below.
     ```bash
     ./start-stop.sh --test
     ```
@@ -37,7 +41,7 @@ To test the application locally, follow these steps:
     sudo sysctl --system
     ```
    
-7. Open your browser at https://localhost
+9. Open your browser at https://localhost
 
 
 # Development Setup
