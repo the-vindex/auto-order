@@ -31,8 +31,7 @@ services:
       - prod_network
 
   backend:
-    # REMOVED: build context
-    # ADDED: image path from Artifact Registry
+    # GCP: image path from Artifact Registry
     image: europe-west3-docker.pkg.dev/balmy-chain-467222-a1/auto-order-artifactory/backend:latest
     restart: always
     depends_on:
@@ -62,8 +61,7 @@ services:
       - "traefik.http.services.backend.loadbalancer.server.port=3000"
 
   frontend:
-    # REMOVED: build context and args
-    # ADDED: image path from Artifact Registry
+    # GCP: image path from Artifact Registry
     image: europe-west3-docker.pkg.dev/balmy-chain-467222-a1/auto-order-artifactory/frontend:latest
     restart: always
     depends_on:

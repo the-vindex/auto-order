@@ -14,7 +14,7 @@ services:
       - "--certificatesresolvers.letsencrypt.acme.email=vindex@fastmail.com"
       - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
       # Set Let's Encrypt to staging mode to avoid rate limits during testing.
-#      - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
       - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
       # (Optional) Enable the Traefik dashboard for monitoring.
@@ -25,7 +25,10 @@ services:
       # (Optional) Expose the dashboard on port 8080.
       - "8080:8080"
     volumes:
-      - "${XDG_RUNTIME_DIR}/docker.sock:/var/run/docker.sock:ro"
+      # This is for Rootless Docker - uncomment if you are using it
+#      - "${XDG_RUNTIME_DIR}/docker.sock:/var/run/docker.sock:ro"
+      # This is for standard Docker - use the following line instead
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "letsencrypt_data:/letsencrypt"
     networks:
       - prod_network

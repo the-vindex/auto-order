@@ -5,7 +5,7 @@ set -e
 
 # Default environment file
 ENV_FILE="production.env"
-COMPOSE_FILE="docker-compose.prod.yml"
+COMPOSE_FILE="docker-compose.test.yml"
 PUSH=true
 START=true
 
@@ -14,7 +14,7 @@ START=true
 # --stop stops and skips start
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --test) ENV_FILE="test.env"; COMPOSE_FILE="docker-compose.prod.yml"; shift ;;
+        --test) ENV_FILE="test.env"; COMPOSE_FILE="docker-compose.test.yml"; shift ;;
         --prod) ENV_FILE="production.env"; COMPOSE_FILE="docker-compose.prod.gcp.yml"; shift ;;
         --stop) START=false; shift ;;
         --help) echo "Usage: $0 [--test | --prod] [--stop]"; exit 0 ;;

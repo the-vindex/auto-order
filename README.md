@@ -45,7 +45,7 @@ To quickly setup the application locally, follow these steps. Alternatively, if 
     sudo sysctl --system
     ```
    
-9. Open your browser at https://localhost:5173 (or a custom port if you configured one)
+7. Open your browser at https://localhost
 
 
 ## Development Setup
