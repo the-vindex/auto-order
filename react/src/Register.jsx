@@ -86,7 +86,7 @@ export default function RegisterPage() {
 		onSuccess: data => {
 			setValidationErrors({})
 			console.log('Registration successful:', data)
-			navigate('/login')
+			navigate('/')
 		},
 	})
 
