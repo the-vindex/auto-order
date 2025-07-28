@@ -1,13 +1,42 @@
 version: '3.8'
 
-
 services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: always
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      # IMPORTANT: Change this to your email address for Let's Encrypt.
+      - "--certificatesresolvers.letsencrypt.acme.email=vindex@fastmail.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      # Set Let's Encrypt to staging mode to avoid rate limits during testing.
+      - "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      # (Optional) Enable the Traefik dashboard for monitoring.
+      - "--api.dashboard=true"
+    ports:
+      - "80:80"
+      - "443:443"
+      # (Optional) Expose the dashboard on port 8080.
+      - "8080:8080"
+    volumes:
+      - "${XDG_RUNTIME_DIR}/docker.sock:/var/run/docker.sock:ro"
+      - "letsencrypt_data:/letsencrypt"
+    networks:
+      - prod_network
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
+    restart: always
     depends_on:
       db:
         condition: service_healthy
@@ -20,6 +49,17 @@ services:
     command: npm run start
     networks:
       - prod_network
+    labels:
+      - "traefik.enable=true"
+      # IMPORTANT: Change your-domain.com to your actual domain.
+      - "traefik.http.routers.backend.rule=Host(`vindex.info`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      # Define a middleware to strip the /api prefix.
+      - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api"
+      # Apply the middleware to the router.
+      - "traefik.http.routers.backend.middlewares=strip-api-prefix"
+      - "traefik.http.services.backend.loadbalancer.server.port=3000"
 
   frontend:
     build:
@@ -27,13 +67,18 @@ services:
       dockerfile: Dockerfile
       args:
         - VITE_API_BASE_URL=${VITE_API_BASE_URL}
-    ports:
-      - "5173:80"
+    restart: always
     depends_on:
-      backend:
-        condition: service_started
+      - backend
     networks:
       - prod_network
+    labels:
+      - "traefik.enable=true"
+      # IMPORTANT: Change your-domain.com to your actual domain.
+      - "traefik.http.routers.frontend.rule=Host(`vindex.info`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
 
   db:
     image: postgres:16
@@ -44,8 +89,6 @@ services:
       POSTGRES_DB: auto_order
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d auto_order -t 1"]
       interval: 5s
@@ -56,6 +99,7 @@ services:
 
 volumes:
   postgres_data:
+  letsencrypt_data:
 
 secrets:
   jwt_secret:
