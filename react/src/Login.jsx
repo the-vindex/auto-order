@@ -217,6 +217,7 @@ export default function LoginPage() {
             <p className="text-center text-sm text-muted-foreground">
               Don't have an account?{' '}
               <Button
+                type="button"
                 variant="link"
                 className="px-0 font-normal"
                 onClick={navigateToRegister}>
