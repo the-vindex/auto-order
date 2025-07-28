@@ -9,10 +9,38 @@ Online shoppers often come across products they want but prefer to wait for a sa
 
 ## Quick Start
 
-### (OPTIONAL) Set Up Resend Account
+To test the application locally, follow these steps:
+1. Install modern docker (or docker-compose) on your machine.
+2. Clone the repository:
+    ```bash
+    git clone https://github.com/the-vindex/auto-order.git
+   ```
+3. Navigate to the project directory:
+    ```bash
+    cd auto-order
+    ```
+4. Copy over test.env.example to test.env:
+    ```bash
+    cp test.env.example test.env
+    ```
+5. (OPTIONAL) Set Up Resend Account
+   To receive email notifications in development, a resend api key is needed. Go to resend.com, create an account, and get an API key. Use this api key in your .env file, as RESEND_API_KEY. Ensure the email you use when tseting this app is the same one you use to create your resend account.
 
-To receive email notifications in development, a resend api key is needed. Go to resend.com, create an account, and get an API key. Use this api key in your .env file, as RESEND_API_KEY. Ensure the email you use when tseting this app is the same one you use to create your resend account.
+6. Start the application using script below.
+    ```bash
+    ./start-stop.sh --test
+    ```
+   
+    If you use Rootless Docker, you will need this - drop a file to allow user binding ports below 1024:
+    ```bash
+    sudo echo 'net.ipv4.ip_unprivileged_port_start = 80' > /etc/sysctl.d/99-unprivileged-ports.conf
+    sudo sysctl --system
+    ```
+   
+7. Open your browser at https://localhost
 
+
+# Development Setup
 ### Database Setup
 
 1.  Navigate to the backend directory:
@@ -66,7 +94,9 @@ To receive email notifications in development, a resend api key is needed. Go to
 *   **Database:** PostgreSQL
 *   **Containerization:** Docker
 
-## 3. How to Start in Production
+
+
+# How to Start in Production
 
 To run the application in a production-like Dockerized environment:
 
