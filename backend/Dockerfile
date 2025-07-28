@@ -32,7 +32,8 @@ COPY --from=builder --chown=puppeteer:puppeteer /usr/src/app/package.json ./pack
 COPY --from=builder --chown=puppeteer:puppeteer /usr/src/app/contracts ./contracts
 COPY --from=builder --chown=puppeteer:puppeteer /usr/src/app/drizzle ./drizzle
 
-# No need to switch users; we are already the 'puppeteer' user.
+# Set the environment variable to production
+RUN npx puppeteer browsers install chrome
 
 # Expose port and start the application
 EXPOSE 3000

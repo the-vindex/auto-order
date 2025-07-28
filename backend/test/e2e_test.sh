@@ -4,7 +4,7 @@
 set -e
 
 # --- Configuration ---
-BASE_URL="https://vindex.info/api/v1"
+BASE_URL="https://localhost/api/v1"
 
 #BASE_URL="https://timely.tier-zero.co.uk/api/v1"
 
