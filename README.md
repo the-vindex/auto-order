@@ -44,7 +44,7 @@ To test the application locally, follow these steps:
 9. Open your browser at https://localhost:5173 (or a custom port if you configured one)
 
 
-# Development Setup
+## Development Setup
 ### Database Setup
 
 1.  Navigate to the backend directory:
