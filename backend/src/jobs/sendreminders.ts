@@ -5,10 +5,10 @@ import { sendReminderEmail } from '../notifier/notifier';
 import { scrapeAmazonPrice } from './scrapeprices';
 
 console.log('task being scheduled...')
-cron.schedule('*/15 * * * * *', () => {
-	console.log('Starting notification batch.');
-	checkProductsForPriceNotificiation();
-});
+// cron.schedule('*/15 * * * * *', () => {
+// 	console.log('Starting notification batch.');
+// 	checkProductsForPriceNotificiation();
+// });
 
 /*
 export async function checkProductsForDueDateNotification() {
