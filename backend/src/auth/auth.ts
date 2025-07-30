@@ -9,17 +9,20 @@ import fs from 'fs';
 let _jwtSecret: string | undefined;
 
 export function initAuth() {
-	if (process.env.JWT_SECRET) {
-		_jwtSecret = process.env.JWT_SECRET;
-	} else {
-		try {
-			// Docker secrets are mounted at /run/secrets/<secret_name>
-			_jwtSecret = fs.readFileSync('/run/secrets/jwt_secret', 'utf8').trim();
-		} catch (error) {
-			console.error("JWT_SECRET is not set in environment variables or as a Docker secret.");
-			process.exit(1);
-		}
-	}
+    if (process.env.JWT_SECRET) {
+        _jwtSecret = process.env.JWT_SECRET;
+    } else {
+        try {
+            // Docker secrets are mounted at /run/secrets/<secret_name>
+            _jwtSecret = fs.readFileSync('/run/secrets/jwt_secret', 'utf8').trim();
+        } catch (error) {
+            console.error("JWT_SECRET is not set in environment variables or as a Docker secret.");
+            // TODO: Instead of terminating the process, throw an error and let the application fail fast during startup.
+            // A centralised config validator should gather missing env vars and produce a descriptive error. This avoids
+            // calling process.exit() in library code, which complicates testing and causes integration tests to exit unexpectedly.
+            process.exit(1);
+        }
+    }
 }
 
 export function getJwtSecret(): string {

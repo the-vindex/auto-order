@@ -63,6 +63,9 @@ export default function RegisterPage() {
 	const mutation = useMutation({
 		mutationFn: async () => {
 			if (!validateForm()) {
+				// TODO: Validation logic is duplicated across the Login and Register pages.  Extract form
+				// validation into a reusable hook or adopt a form library such as React Hook Form or Formik.
+				// This will reduce boilerplate and improve maintainability.
 				throw new Error('')
 			}
 			return createUser(formData.username, formData.email, formData.password)

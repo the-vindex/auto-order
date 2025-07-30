@@ -56,6 +56,10 @@ export default function LoginPage() {
       if (!validateForm()) {
         throw new Error('Validation failed')
       }
+      // TODO: Storing the user email in localStorage exposes personally identifiable information.  Instead,
+      // rely on the server to manage session state via HTTP‑only cookies and avoid persisting sensitive
+      // data in the browser. If a client‑side cache of the email is required for UX (e.g. pre‑filling forms),
+      // consider using React state or a secure storage API.
       localStorage.setItem('email', formData.email)
       return loginUser(formData.email, formData.password)
     },

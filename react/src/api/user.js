@@ -26,6 +26,11 @@ export async function createUser(name, email, password) {
 	date.setTime(date.getTime() + 24 * 60 * 60 * 1000) // 24 hours in ms
 	const expires = 'expires=' + date.toUTCString()
 
+	// TODO: The frontend sets the username and email in plain cookies.  This leaks user
+	// information to client‑side scripts and does not provide any security benefit because
+	// authentication is handled via an HTTP‑only token cookie set by the server.  Consider
+	// removing these cookies entirely or replacing them with a minimal, non‑PII flag indicating
+	// that the user is logged in.
 	document.cookie = `username=${responseBody.name}; ${expires}; path=/`
 	document.cookie = `email=${responseBody.email}; ${expires}; path=/`
 
@@ -57,6 +62,9 @@ export async function loginUser(email, password) {
 	date.setTime(date.getTime() + 24 * 60 * 60 * 1000) // 24 hours in ms
 	const expires = 'expires=' + date.toUTCString()
 
+	// TODO: Avoid storing username and email in plain cookies.  See corresponding comment in
+	// createUser().  Use secure, HTTP‑only cookies set by the server for authentication and
+	// store non‑sensitive data in React state or context instead.
 	document.cookie = `username=${body.name}; ${expires}; path=/`
 	document.cookie = `email=${body.email}; ${expires}; path=/`
 
