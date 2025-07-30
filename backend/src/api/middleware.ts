@@ -43,6 +43,10 @@ export function errorMiddleWare(
 }
 
 export function authMiddleWare(req: Request, res: Response, next: NextFunction) {
+	// TODO: This middleware currently throws a generic error if JWT validation fails.
+	// It should throw a specific `UserNotAuthenticatedError` so that the `errorMiddleWare`
+	// can handle it gracefully and return a 401 status code.
+	// Also, the error handling could be more robust, for example by checking if the token exists first.
 	try {
 		const token = req.cookies.token;
 		const userId = validateJWT(token, getJwtSecret());
