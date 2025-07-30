@@ -1,4 +1,9 @@
 import express from "express";
+// TODO: This file is getting large and contains a lot of business logic.
+// Consider introducing a "service layer" that would be responsible for the business logic,
+// and keeping the API handlers (the functions in this file) responsible only for handling
+// the HTTP request and response. This will make the code more modular, easier to test, and more reusable.
+
 import { ProductReminderDto } from "./dto/product_reminder.dto";
 import {
 	createProductReminder,

@@ -1,4 +1,8 @@
 import { useState } from 'react'
+// TODO: This component handles loading state, but not error states.
+// When using a library like TanStack Query, it's important to handle all three states: loading, error, and success.
+// Consider adding a check for the `isError` status from the query and displaying a user-friendly error message
+// if the data fetching fails. This will improve the user experience by providing clear feedback when something goes wrong.
 import { Search } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { ReminderCard } from './ReminderCard'
