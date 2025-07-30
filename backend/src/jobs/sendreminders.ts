@@ -5,6 +5,10 @@ import { sendReminderEmail } from '../notifier/notifier';
 import { scrapeAmazonPrice } from './scrapeprices';
 
 console.log('task being scheduled...')
+// TODO: The current cron schedule runs every 15 seconds, which is overly aggressive for web scraping and email
+// notifications. Scraping Amazon pages too frequently risks being rate limited and wastes resources. Consider
+// increasing the interval (e.g., every 30–60 minutes) or making it configurable via an environment variable.
+
 // cron.schedule('*/15 * * * * *', () => {
 // 	console.log('Starting notification batch.');
 // 	checkProductsForPriceNotificiation();

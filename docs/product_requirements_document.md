@@ -26,19 +26,18 @@ Shoppers juggle wish‑lists, seasonal deals, and fluctuating prices across mult
 
 ## 4. Key User Scenarios
 
-1. **Schedule‑Based Reminder**
-   • User pastes product URL → chooses "remind me in X days/weeks".
-   • System stores item, sets timer, sends push/email at due time.
-   **Architecture:** DB entity `product_tracking`, job scheduler, notification service, basic auth (email/password).
-2. **Price‑Drop Reminder (single site)**
-   • User pastes supported URL → system scrapes current price.
-   • If future scrape returns lower price, notify.
-   **Architecture:** Headless scraper (Playwright), price history store, diff checker.
-3. **Multi‑Site Monitoring**
-   • System maintains per‑site scrape scripts.
-   • On add, service validates URL → accepts/rejects.
-   • Scalable worker pool runs scrapers on CRON or event‑driven.
-   **Architecture:** Site registry table, queue‑based workers, rate‑limit & anti‑bot strategy.
+1. **Time‑based Reminder (implemented)**\
+   • User pastes an Amazon product URL and selects a future date and time.\
+   • The system stores the reminder and sends an email on the due date.\
+   **Implementation:** Express route `/api/v1/product-reminders` persists the reminder in `product_reminders` with type `date`, and a cron job checks due reminders and triggers email notifications.
+2. **Price‑drop Reminder (implemented)**\
+   • User pastes an Amazon product URL and sets a target price.\
+   • The backend scrapes the current price at creation time and stores it as `initialPrice`.  A background job periodically re‑scrapes the page.  When the price drops below the target, the user receives an email.\
+   **Implementation:** The scraping logic uses Puppeteer, scheduled via a cron job in `jobs/sendreminders.ts`.  Only Amazon is currently supported.
+3. **Future enhancements (not yet implemented)**\
+   • Support additional e‑commerce sites via pluggable scraper modules.\
+   • Provide multi‑site monitoring and selection from a list of supported retailers.\
+   • Persist detailed price history and surface charts in the UI.
 
 ---
 
@@ -46,24 +45,27 @@ Shoppers juggle wish‑lists, seasonal deals, and fluctuating prices across mult
 
 | ID   | Requirement                                                       | Priority |
 | ---- | ----------------------------------------------------------------- | -------- |
-| FR‑1 | User can sign‑in (email/password)                                 | Must     |
+| FR‑1 | Users can register and log in with email and password (JWT‑based authentication) | Must |
 | FR‑2 | Add product by URL with: reminder interval, optional target price | Must     |
 | FR‑3 | Validate URL against supported list                               | Must     |
 | FR‑4 | Persist tracking data in PostgreSQL/SQLite                        | Must     |
-| FR‑5 | Scheduler triggers notifications (push + email)                   | Must     |
-| FR‑6 | Scrape current price for Site #1 (e.g., Amazon.de)                | Must     |
+| FR‑5 | Scheduler triggers notifications (email via Resend)              | Must     |
+| FR‑6 | Scrape current price for Site #1 (e.g., Amazon.de)                | Must     |
 | FR‑7 | If current price < recorded price, queue notification             | Must     |
 | FR‑8 | UI shows active reminders & ability to cancel                     | Should   |
-| FR‑9 | Basic analytics dashboard (price history chart)                   | Could    |
+| FR‑9 | Basic analytics dashboard (price history chart)                   | Future   |
 
 ---
 
-## 6. Extended Requirements (Post‑MVP)
+## 6. Extended Requirements (Future work)
 
-- Multi‑site scraping via configurable Playwright scripts.
-- User‑editable target price & currency conversion.
-- AI price‑prediction to suggest "wait/buy now".
-- Social sharing of deals.
+The current implementation covers the core reminder functionality for Amazon.  Future enhancements could include:
+
+* **Multi‑site scraping:** Add support for multiple online retailers by implementing additional scraper modules and a site registry.
+* **Currency conversion & localisation:** Allow users to specify currency and convert prices automatically.
+* **Rich notification channels:** Support push notifications and SMS in addition to email.
+* **Analytics & insights:** Store full price histories, display charts in the UI, and provide AI‑based suggestions (e.g., "wait for further drop").
+* **Magic‑link login:** Replace email/password auth with passwordless login for convenience.
 
 ---
 
@@ -116,17 +118,16 @@ ProductReminder {
 ## 10. System Architecture Overview
 
 ```
-[ React PWA ] ↔ [ REST API (Node/Express) ]
-                             │
-            ┌──────── DB (PostgreSQL) ────────┐
-            │                                 │
-   [ node-cron ]                   [ Resend (email) ]
-            │                                 │
-   [ Puppeteer Scraper ] ┴→ FCM / Email
+[ React SPA (Vite) ] ↔ [ REST API (Node/Express) ]
+                          │
+                ┌─── DB (PostgreSQL via Drizzle) ───┐
+                │                                    │
+   [ Cron job → Scraper ]                 [ Email Notification Service ]
+                │                                    │
+         [ Puppeteer scraping Amazon ]  ─────────────┘
 ```
 
-- **Deployment:** Vercel (frontend), Render.com/Fly.io (API + workers).
-- **CI/CD:** GitHub Actions.
+*The application is deployed as a single Dockerised service with the frontend and backend served separately.  Continuous integration is configured via GitHub Actions.*
 
 ---
 
@@ -179,9 +180,7 @@ ProductReminder {
 
    - **Fields/UI:** Email input, Password input, “Sign In” button, legal links.
    - **Validation:** Must be valid email format; inline error.
-   - **Primary Action:** `SIGN IN`.
-   - **Success:** Redirect to reminders list.
-   - **Edge Cases:** Invalid credentials toast.
+
 
 2. **Reminders List**
 
@@ -208,7 +207,9 @@ ProductReminder {
 
    - **Sections:**
       - Account: email, Log out.
-      - Danger Zone: Delete account modal.
+      - (Future) Notifications: toggle Push, Email; "Test notification".
+      - (Future) App: Theme (Auto/Light/Dark), Currency preference.
+      - (Future) Danger Zone: Delete account modal.
 
 ### 14.3 Primary User Flows
 
@@ -246,8 +247,6 @@ ProductReminder {
 - Scrape failure: banner "Price check failed", option to retry.
 - Offline: banner "You are offline".
 
-*Last updated: 30 Jul 2025*
-
 
 
 ## 15. REST API Surface (MVP)
@@ -279,13 +278,36 @@ All endpoints are prefixed with `/v1` and require a Bearer JWT obtained via the 
 | **PUT**    | `/product-reminders/{id}`   | Update product reminder                          |
 | **DELETE** | `/product-reminders/{id}`   | Cancel reminder                                  |
 
-### 15.4 Error Codes
+Postponed until when needed:
+
+| Method     | Path                        | Purpose                                          |
+|------------|-----------------------------|--------------------------------------------------|
+| **GET**    | `/product-reminders/{id}`   | Detail incl. price sparkline                     |
+| **PATCH**  | `/product-reminders/{id}`   | Update target price / date / status              |
+
+### 15.5 Price Samples (history)
+
+| Method  | Path                     | Purpose                            |
+| ------- | ------------------------ | ---------------------------------- |
+| **GET** | `/product-reminders/{id}/prices` | Latest N price points (default 30) |
+
+### 15.6 Notifications
+
+| Method    | Path                  | Purpose                       |
+| --------- | --------------------- | ----------------------------- |
+| **GET**   | `/notifications`      | List sent notifications (log) |
+| **PATCH** | `/notifications/{id}` | Mark read = true              |
+
+### 15.7 Error Codes
 
 | Code | Meaning       | Common Causes                            |
 | ---- | ------------- | ---------------------------------------- |
 | 400  | Bad Request   | malformed JSON                           |
 | 401  | Unauthorized  | missing/expired JWT                      |
+| 403  | Forbidden     | URL from unsupported domain              |
 | 404  | Not Found     | unknown tracking ID                      |
+| 409  | Conflict      | duplicate URL for same user              |
+| 422  | Unprocessable | validation failed (e.g., negative price) |
 | 500  | Server Error  | scrape failure, etc.                     |
 
 ---

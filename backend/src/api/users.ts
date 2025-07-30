@@ -11,10 +11,12 @@ export async function createUserApi(req: express.Request, res: express.Response)
 			return res.status(400).send('Bad Request: Missing request body');
 		}
 
-		const { name, email, password } = req.body;
+        const { name, email, password } = req.body;
 
-		//prob shouldnt be logging emails/passwords
-		const newUser = await createUser(name, email, password);
+        // TODO: Avoid logging sensitive information such as email addresses and passwords.  Consider using a
+        // request logger that redacts sensitive fields (already implemented in src/middleware/logger.ts) and
+        // remove explicit console logs for user credentials.
+        const newUser = await createUser(name, email, password);
 
 		setAuthCookie(res, newUser.userId);
 		respondWithJSON(res, 201, { name: newUser.name, email: newUser.email });
