@@ -78,11 +78,20 @@ To quickly setup the application locally, follow these steps. Alternatively, if 
    ```bash
    docker compose up -d
    ```
-3.  Install backend dependencies:
+4.  Install backend dependencies:
     ```bash
     npm install
     ```
-4.  Start the backend in development mode:
+5.  Puppeteer needs some additional setup, namely installing the Chromium browser. This can be done by running:
+    ```bash
+    npx puppeteer install
+    ```
+    You will also need to follow https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md.
+    - Applies to Ubuntu 23+, best case you have Chrome installed through apt and end up adding following line to .bashrc:
+    ```bash
+    export CHROME_DEVEL_SANDBOX=/usr/lib/chromium-browser/chrome-sandbox
+    ```
+6.  Start the backend in development mode:
     ```bash
     npm run dev
     ```
@@ -103,6 +112,13 @@ To quickly setup the application locally, follow these steps. Alternatively, if 
     npm run dev
     ```
     The frontend will typically run on `http://localhost:5173`.
+
+### Nifty tools
+1. To start both FE and BE for development, use dev.sh script:
+    ```bash
+    ./dev.sh
+    ```
+    This will start both the backend and frontend servers concurrently, plus postgres in the background.
 
 ## Tech Stack
 
