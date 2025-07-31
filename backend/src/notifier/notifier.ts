@@ -25,7 +25,7 @@ export async function sendReminderEmail(
 `;
 
 	const result = await resend.emails.send({
-		from: 'Auto Order <onboarding@resend.dev>',
+		from: 'Timely Buy <onboarding@resend.dev>',
 		to: email,
 		subject: '🎯 Price Drop Alert – Your Product is on Sale!',
 		html,
