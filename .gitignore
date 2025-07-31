@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 /jwt.secret
 /production.env
 /test.env
+/react/.auth/user.json
+/react/playwright-report/index.html
+/react/test-results/.last-run.json

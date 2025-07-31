@@ -51,7 +51,10 @@ npm install              # Install dependencies
 npm run dev             # Start Vite dev server (port 5173)
 npm run build           # Build for production
 npm run lint            # Run ESLint
-npm test:e2e            # Run Playwright E2E tests
+npm run test:e2e        # Run Playwright E2E tests
+npm run test:e2e:ui     # Run Playwright tests with UI
+npm run test:e2e:debug  # Run Playwright tests in debug mode
+npm run test:setup      # Run only authentication setup
 ```
 
 ### Full Stack Development
@@ -99,6 +102,25 @@ docker-compose down     # Stop PostgreSQL container
 - **Backend**: Vitest for unit/integration tests in `backend/test/`
 - **Frontend**: Playwright for E2E tests in `react/tests/`
 - **Test Environment**: Uses separate test database and environment files
+- **User Management**: Ephemeral test users created via API for each test run
+- **Authentication**: Pre-authenticated state saved in `.auth/user.json` for faster test execution
+
+### Playwright Testing Structure
+```
+react/tests/
+├── e2e/              # End-to-end test files
+├── fixtures/         # Custom test fixtures and mock data  
+├── page-objects/     # Page Object Models using modern Playwright locators
+├── utils/            # API helpers for user creation
+├── setup/            # Global setup and teardown
+└── auth.setup.ts     # Authentication setup for test projects
+```
+
+**Playwright Best Practices Applied:**
+- Uses modern locators: `getByRole()`, `getByLabel()`, `getByText()` over CSS selectors
+- User-facing locators that mirror accessibility and screen reader behavior
+- Ephemeral test users created via `/api/v1/users` endpoint with timestamp-based emails
+- Auto-waiting and retry-ability with built-in Playwright assertions
 
 ## Key Configuration Files
 - `backend/drizzle.config.ts` - Database connection and migration config
