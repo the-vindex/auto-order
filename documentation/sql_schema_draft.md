@@ -2,7 +2,7 @@
 
 This is a draft of the SQL schema for the project, based on the database diagram:
 
-![DB Diagram v1](/docs/DB%20diagram%20v1.png)
+![DB Diagram v1](/documentation/DB%20diagram%20v1.png)
 
 PostgresSQL dialect is used, with some assumptions about the data types and constraints.
 ```sql
