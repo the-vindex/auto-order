@@ -1,7 +1,7 @@
 # Timely Buyer
 Track sales on your favorite items, all in one place!
 
-![Screenshot of Timely Buyer](./docs/home_page.png)
+![Screenshot of Timely Buyer](documentation/home_page.png)
 
 ## Motivation
 
