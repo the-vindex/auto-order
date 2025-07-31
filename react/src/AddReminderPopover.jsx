@@ -180,7 +180,7 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
                     Add
                   </Button>
                 </div>
-                {urlError && <p className="text-red-500 text-xs">{urlError}</p>}
+                {urlError && <p className="text-red-500 text-xs" data-testid="url-error-message">{urlError}</p>}
                 {formData.urls.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-2">
                     {formData.urls.map((url, index) => (
@@ -245,7 +245,7 @@ export function AddReminderPopover({ onSubmit, isLoading, isError, error }) {
 
               {/* Error Message */}
               {isError && (
-                <div className="text-red-500 text-xs text-center">
+                <div className="text-red-500 text-xs text-center" data-testid="form-error-message">
                   {error?.message || 'Failed to create reminder'}
                 </div>
               )}

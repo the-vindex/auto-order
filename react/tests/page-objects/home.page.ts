@@ -12,8 +12,7 @@ export class HomePage extends BasePage {
   constructor(private page: Page) {
     super(page);
     this.addReminderButton = page.getByRole('button', { name: 'Add' });
-    //@CLAUDE: locator by CSS? Fix it by using something more specific. Feel free to modify page code.
-    this.remindersList = page.locator('.space-y-4'); // The container with reminder cards
+    this.remindersList = page.getByTestId('reminders-container');
     this.welcomeMessage = page.getByRole('heading', { name: /my reminders/i });
     this.searchInput = page.getByPlaceholder('Search reminders...');
     this.filterDropdown = page.getByRole('combobox').or(page.getByRole('button', { name: /filter/i }));
@@ -41,25 +40,10 @@ export class HomePage extends BasePage {
     // Wait for reminders to load
     await this.page.waitForTimeout(2000); // Give more time for API response and rendering
     
-    // Try multiple selectors for reminder cards
-    const cardSelectors = [
-      '[class*="Card"]',
-      '.mb-4', // From ReminderCard component
-      '[class*="card"]',
-      '.space-y-4 > div' // Direct children of the reminders container
-    ];
-    
-    for (const selector of cardSelectors) {
-      const cards = await this.page.locator(selector).all();
-      if (cards.length > 0) {
-        console.log(`Found ${cards.length} cards with selector: ${selector}`);
-        return cards;
-      }
-    }
-    
-    // If no cards found, return empty array
-    console.log('No reminder cards found with any selector');
-    return [];
+    // Use the specific test ID for reminder cards
+    const cards = await this.page.getByTestId('reminder-card').all();
+    console.log(`Found ${cards.length} cards with test ID selector`);
+    return cards;
   }
 
   async searchReminders(query: string): Promise<void> {
@@ -67,9 +51,7 @@ export class HomePage extends BasePage {
   }
 
   async getReminderByTitle(title: string): Promise<Locator> {
-    // Be more specific with card selector and ensure we're looking for reminder cards
-    //@CLAUDE: Try to find more specific locator or make one
-    return this.page.locator('.mb-4').filter({ hasText: title });
+    return this.page.getByTestId('reminder-card').filter({ hasText: title });
   }
 
   async deleteReminder(title: string): Promise<void> {

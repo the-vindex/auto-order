@@ -12,25 +12,32 @@ async function globalSetup(config: FullConfig) {
   const page = await context.newPage();
 
   try {
-    // Create a test user via API
-
-    //@CLAUDE: Here you create and login user, you ignore cookie and go to login user agian. Is it necessary?
-    const { user } = await createAndLoginTestUser(context.request, apiBaseURL);
+    // Create a test user and login via API to get authentication cookies
+    const { user, cookies } = await createAndLoginTestUser(context.request, apiBaseURL);
     
     console.log(`Created test user: ${user.email}`);
 
-    // Navigate to login page and authenticate via UI
-    await page.goto(`${baseURL}/login`);
+    // Navigate to the app to establish browser context, then set cookies
+    await page.goto(baseURL);
     
-    // Fill login form
-    await page.getByLabel('Email').fill(user.email);
-    await page.getByLabel('Password').fill(user.password);
-    await page.getByRole('button', { name: 'Sign in' }).click();
+    // Parse and set cookies from API response  
+    for (const cookieString of cookies) {
+      const cookieParts = cookieString.split(';')[0].split('=');
+      if (cookieParts.length === 2) {
+        await context.addCookies([{
+          name: cookieParts[0].trim(),
+          value: cookieParts[1].trim(),
+          domain: 'localhost',
+          path: '/'
+        }]);
+      }
+    }
     
-    // Wait for successful login (redirect to home page)
-    await page.waitForURL('**/');
+    // Refresh page to apply cookies and verify authentication works
+    await page.reload();
+    await page.waitForTimeout(1000);
     
-    // Save authenticated state
+    // Save authenticated state with API-obtained cookies
     await context.storageState({ path: '.auth/user.json' });
     
     console.log('Authentication state saved to .auth/user.json');

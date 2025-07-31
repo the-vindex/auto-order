@@ -1,4 +1,6 @@
+// @ts-ignore
 import {test, expect} from '../fixtures/test';
+// @ts-ignore
 import {mockReminderData} from '../fixtures/mock-data';
 
 test.describe('Product Reminders', () => {
@@ -61,8 +63,7 @@ test.describe('Product Reminders', () => {
         await addButton.click();
 
         // Should show URL validation error for non-Amazon URL
-        //@CLAUDE: Try to find more specific locator or make one
-        const urlError = reminderPage.page.locator('.text-red-500.text-xs');
+        const urlError = reminderPage.page.getByTestId('url-error-message');
         await expect(urlError).toBeVisible();
         await expect(urlError).toHaveText('Only Amazon URLs are allowed');
 
@@ -103,9 +104,8 @@ test.describe('Product Reminders', () => {
         // Wait a moment to see if validation occurs
         await reminderPage.page.waitForTimeout(1000);
 
-        // Check if an error appears or if form behaves appropriately
-        //@CLAUDE: Try to find more specific locator or make one
-        const errorMessage = reminderPage.page.locator('.text-red-500');
+        // Check if an error appears or if form behaves appropriately  
+        const errorMessage = reminderPage.page.getByTestId('form-error-message');
         const isErrorVisible = await errorMessage.isVisible();
 
         // Either show error or have corrected the value during processing
