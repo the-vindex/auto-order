@@ -56,7 +56,7 @@ export function AppSidebar({ onNavigate, currentView }) {
             <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping"></div>
           </div>
           <div className="flex flex-col">
-            <h1 className="text-xl font-semibold text-blue-600">Auto Order</h1>
+            <h1 className="text-xl font-semibold text-blue-600">Timely Buy</h1>
             <p className="text-sm text-muted-foreground">
               Track prices automatically
             </p>

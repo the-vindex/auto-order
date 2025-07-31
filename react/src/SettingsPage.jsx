@@ -66,7 +66,7 @@ export function SettingsPage() {
           <CardContent>
             <div className="space-y-3">
               <div>
-                <h4 className="font-medium">Auto-Order</h4>
+                <h4 className="font-medium">Timely-Buy</h4>
                 <p className="text-sm text-gray-500">Boot.dev Hackathon 2025</p>
               </div>
               <div>
