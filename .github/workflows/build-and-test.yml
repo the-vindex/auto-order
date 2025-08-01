@@ -118,13 +118,16 @@ jobs:
     - name: Start backend server
       run: npm start &
       working-directory: ./backend
-      env:
+      env:  
         DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/auto_order?schema=public"
+        CORS_ORIGIN: "http://localhost:4173"
+        JWT_SECRET: "superdupersecret"
+        ENVIRONMENT: "local"
     
     - name: Wait for backend to be ready
       run: |
         for i in $(seq 1 30); do
-          curl -f http://localhost:3000/api/v1/ping && break
+          curl -f http://localhost:3000/ && break
           echo "Waiting for backend..."
           sleep 2
         done
@@ -143,7 +146,7 @@ jobs:
       working-directory: ./react
     
     - name: Start frontend server
-      run: npm run preview &
+      run: npm run preview -- --port 4173 &
       working-directory: ./react
     
     - name: Wait for frontend to be ready
