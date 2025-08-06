@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:13
+        image: postgres:16
         env:
           POSTGRES_DB: auto_order
           POSTGRES_USER: postgres
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:13
+        image: postgres:16
         env:
           POSTGRES_DB: auto_order
           POSTGRES_USER: postgres
@@ -120,7 +120,7 @@ jobs:
       working-directory: ./backend
       env:  
         DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/auto_order?schema=public"
-        CORS_ORIGIN: "http://localhost:4173"
+        CORS_ORIGIN: "http://localhost:5173"
         JWT_SECRET: "superdupersecret"
         ENVIRONMENT: "local"
     
@@ -146,13 +146,13 @@ jobs:
       working-directory: ./react
     
     - name: Start frontend server
-      run: npm run preview -- --port 4173 &
+      run: npm run preview -- --port 5173 &
       working-directory: ./react
     
     - name: Wait for frontend to be ready
       run: |
         for i in $(seq 1 20); do
-          curl -f http://localhost:4173 && break
+          curl -f http://localhost:5173 && break
           echo "Waiting for frontend..."
           sleep 2
         done
