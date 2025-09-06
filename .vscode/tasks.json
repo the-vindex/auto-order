@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Backend Tests",
+      "type": "shell",
+      "command": "npm test",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": {
+        "owner": "vitest",
+        "fileLocation": "absolute",
+        "pattern": {
+          "regexp": "^\s+at\s+(.*):(\d+):(\d+)$",
+          "file": 1,
+          "line": 2,
+          "column": 3
+        }
+      }
+    }
+  ]
+}

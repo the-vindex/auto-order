@@ -1,0 +1,7 @@
+{
+  "vitest.enable": true,
+  "vitest.commandLine": "npm run test",
+  "testing.openTesting": "openOnTestStart",
+  "testing.followRunningTest": true,
+  "testing.defaultGutterClickAction": "run"
+}
