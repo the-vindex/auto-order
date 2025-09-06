@@ -2,7 +2,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16
-    container_name: app-postgres
+    container_name: auto_order-app-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -10,8 +10,8 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - auto_order_postgres_data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  auto_order_postgres_data:
 
