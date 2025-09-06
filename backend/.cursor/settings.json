@@ -3,7 +3,7 @@
   "vitest.commandLine": "npm test",
   "vitest.rootConfig": "./vitest.config.mjs",
   "typescript.preferences.includePackageJsonAutoImports": "auto",
-  "vitest.include": ["test/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+  "vitest.include": ["test/**/*.{test,spec}.{ts,mts,cts,jsx,tsx}"],
   "vitest.exclude": ["node_modules", "dist", ".idea", ".git", ".cache"],
   "testing.automaticallyOpenPeekView": "never",
   "testing.defaultGutterClickAction": "run",

@@ -3,7 +3,7 @@ export default {
   test: {
     globals: true,
     environment: 'node',
-    include: ['test/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    include: ['test/**/*.{test,spec}.{ts,mts,cts,jsx,tsx}'],
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
     testTimeout: 10000,
     hookTimeout: 10000,
