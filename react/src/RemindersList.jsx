@@ -38,7 +38,7 @@ export function RemindersList({ isLoading, reminders = [] }) {
         </div>
       )}
       {/* Reminders list */}
-      <div className="space-y-4">
+      <div className="space-y-4" data-testid="reminders-container">
         {filteredReminders.map(reminder => (
           <ReminderCard
             isLoading={isLoading}
