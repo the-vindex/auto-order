@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:13
+        image: postgres:16
         env:
           POSTGRES_DB: auto_order
           POSTGRES_USER: postgres
@@ -70,3 +70,104 @@ jobs:
     - name: Build React app
       run: npm run build
       working-directory: ./react
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: auto_order
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    
+    # Backend setup
+    - name: Wait for PostgreSQL to be ready
+      run: |
+        for i in $(seq 1 10); do
+          nc -z localhost 5432 && break
+          echo "Waiting for PostgreSQL..."
+          sleep 5
+        done
+    
+    - name: Install backend dependencies
+      run: npm install
+      working-directory: ./backend
+    
+    - name: Build backend
+      run: npm run build
+      working-directory: ./backend
+    
+    - name: Create backend .env file
+      run: cp .env.example .env
+      working-directory: ./backend
+    
+    - name: Start backend server
+      run: npm start &
+      working-directory: ./backend
+      env:  
+        DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/auto_order?schema=public"
+        CORS_ORIGIN: "http://localhost:5173"
+        JWT_SECRET: "superdupersecret"
+        ENVIRONMENT: "local"
+    
+    - name: Wait for backend to be ready
+      run: |
+        for i in $(seq 1 30); do
+          curl -f http://localhost:3000/ && break
+          echo "Waiting for backend..."
+          sleep 2
+        done
+    
+    # Frontend setup
+    - name: Install React dependencies
+      run: npm install
+      working-directory: ./react
+    
+    - name: Build React app
+      run: npm run build
+      working-directory: ./react
+    
+    - name: Install Playwright browsers
+      run: npx playwright install --with-deps
+      working-directory: ./react
+    
+    - name: Start frontend server
+      run: npm run preview -- --port 5173 &
+      working-directory: ./react
+    
+    - name: Wait for frontend to be ready
+      run: |
+        for i in $(seq 1 20); do
+          curl -f http://localhost:5173 && break
+          echo "Waiting for frontend..."
+          sleep 2
+        done
+    
+    # Run E2E tests
+    - name: Run Playwright E2E tests
+      run: npm run test:e2e
+      working-directory: ./react
+      env:
+        CI: true
+    
+    - name: Upload Playwright report
+      uses: actions/upload-artifact@v4
+      if: failure()
+      with:
+        name: playwright-report
+        path: react/playwright-report/
+        retention-days: 30

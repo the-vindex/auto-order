@@ -112,7 +112,7 @@ export function ReminderCard({ isLoading, item }) {
   }
 
   return (
-    <Card className="mb-4">
+    <Card className="mb-4" data-testid="reminder-card">
       <CardContent className="p-4">
         <div className="flex items-start gap-4">
           <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
